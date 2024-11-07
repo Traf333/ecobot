@@ -1,0 +1,10 @@
+[package]
+name = "server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+teloxide = { workspace = true }
+tokio = { workspace = true }
+log = { workspace = true }
+pretty_env_logger = { workspace = true }
