@@ -1,0 +1,52 @@
+{
+  "home": {
+    "path": "/",
+    "label": "Главная",
+    "children": ["recycling", "about"]
+  },
+  "about": {
+    "path": "/about",
+    "label": "О нас"
+  },
+  "recycling": {
+    "path": "/recycling",
+    "label": "Переработка",
+    "children": [
+      "solid_plastic",
+      "soft_plastic",
+      "paper",
+      "metal",
+      "glass",
+      "organic",
+      "other"
+    ]
+  },
+  "solid_plastic": {
+    "path": "/solid_plastic",
+    "label": "Твердый пластик"
+  },
+  "soft_plastic": {
+    "path": "/soft_plastic",
+    "label": "Мягкий пластик"
+  },
+  "paper": {
+    "path": "/paper",
+    "label": "Бумага"
+  },
+  "metal": {
+    "path": "/metal",
+    "label": "Металл"
+  },
+  "glass": {
+    "path": "/glass",
+    "label": "Стекло"
+  },
+  "organic": {
+    "path": "/organic",
+    "label": "Органические"
+  },
+  "other": {
+    "path": "/other",
+    "label": "Другое"
+  }
+}
