@@ -67,6 +67,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 /// Creates a keyboard made by buttons in a big column.
 fn make_keyboard(category: &str) -> InlineKeyboardMarkup {
     let mut keyboard: Vec<Vec<InlineKeyboardButton>> = vec![];
+    log::info!("category: {}", category);
     let route = ROUTES.get(category).expect("Route not found");
 
     if let Some(children) = &route.children {
@@ -78,7 +79,7 @@ fn make_keyboard(category: &str) -> InlineKeyboardMarkup {
             )]);
         }
     }
-
+    keyboard.push(vec![InlineKeyboardButton::callback("Назад", category)]);
     InlineKeyboardMarkup::new(keyboard)
 }
 
@@ -167,27 +168,12 @@ async fn callback_handler(bot: Bot, q: CallbackQuery) -> Result<(), Box<dyn Erro
         // parameters to tweak what happens on the client side.
         bot.answer_callback_query(&q.id).await?;
         let route = route.to_string().replace("/", "");
-        log::info!("You chose: {}", route);
+        let keyboard = make_keyboard(&route);
 
-        let route = ROUTES.get(&route).expect("Route not found");
-        let choose_route = InlineQueryResultArticle::new(
-            "1",
-            route.label.to_owned(),
-            InputMessageContent::Text(InputMessageContentText::new(route.label.to_owned())),
-        )
-        .reply_markup(make_keyboard(&route.path));
-
-        bot.answer_inline_query(q.id, vec![choose_route.into()])
+        bot.send_message(q.from.id, format!("You selected: {}", route))
+            .reply_markup(keyboard)
             .await?;
-        // // Edit text of the message to which the buttons were attached
-        // if let Some(message) = q.regular_message() {
-        //     bot.edit_message_text(q.chat_id().unwrap(), message.id, text)
-        //         .await?;
-        // } else if let Some(id) = q.inline_message_id {
-        //     bot.edit_message_text_inline(id, text).await?;
-        // }
-
-        log::info!("You chose: {}", route.label);
+        log::info!("You chose: {}", route);
     }
 
     Ok(())
