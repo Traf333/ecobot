@@ -1,19 +1,22 @@
 {
-  "home": {
+  "start": {
     "path": "/",
     "label": "Главная",
-    "children": ["recycling", "about"]
+    "children": ["recycling", "give_away", "faq"]
   },
-  "about": {
-    "path": "/about",
-    "label": "О нас"
+  "faq": {
+    "path": "/faq",
+    "label": "Частые вопросы"
+  },
+  "give_away": {
+    "path": "/give_away",
+    "label": "Отдать ненужное"
   },
   "recycling": {
     "path": "/recycling",
     "label": "Переработка",
     "children": [
-      "solid_plastic",
-      "soft_plastic",
+      "plastic",
       "paper",
       "metal",
       "glass",
@@ -21,13 +24,9 @@
       "other"
     ]
   },
-  "solid_plastic": {
-    "path": "/solid_plastic",
-    "label": "Твердый пластик"
-  },
-  "soft_plastic": {
-    "path": "/soft_plastic",
-    "label": "Мягкий пластик"
+  "plastic": {
+    "path": "/plastic",
+    "label": "Пластик"
   },
   "paper": {
     "path": "/paper",
@@ -44,6 +43,10 @@
   "organic": {
     "path": "/organic",
     "label": "Органические"
+  },
+  "dangerous": {
+    "path": "/dangerous",
+    "label": "Опасные"
   },
   "other": {
     "path": "/other",
