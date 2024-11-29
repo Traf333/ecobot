@@ -1,6 +1,6 @@
 use std::{error::Error, fs::read_to_string};
 
-use log::info;
+use log::{error, info};
 use teloxide::{
     payloads::SendMessageSetters,
     prelude::Requester,
@@ -42,11 +42,11 @@ enum Command {
 }
 
 fn escape_markdown_v2(text: String) -> String {
-    text.replace('.', "\\.") // Escape dots
-        .replace('-', "\\-") // Escape hyphens
-        .replace('{', "\\{") // Escape curly braces
-        .replace('}', "\\}") // Escape curly braces
-        .replace('!', "\\!") // Escape exclamation marks
+    text.replace('.', "\\.")
+        .replace('-', "\\-")
+        .replace('{', "\\{")
+        .replace('}', "\\}")
+        .replace('!', "\\!")
 }
 
 pub async fn message_handler(
@@ -111,12 +111,21 @@ pub async fn callback_handler(
         // clients. You could also use `answer_callback_query`'s optional
         // parameters to tweak what happens on the client side.
         bot.answer_callback_query(&q.id).await?;
+
         let (buttons, content) = build_details(text)?;
-        info!("Sending:  content: {}, text: {}", content, text);
-        bot.send_message(q.from.id, content)
+        // info!("Sending:  content: {}, text: {}", content, text);
+        match bot
+            .send_message(q.from.id, content)
             .parse_mode(ParseMode::MarkdownV2)
             .reply_markup(buttons)
-            .await?;
+            .await
+        {
+            Ok(_) => (),
+            Err(e) => {
+                error!("Error sending message: {:?}", e);
+                bot.send_message(q.from.id, e.to_string()).await?;
+            }
+        };
     }
 
     Ok(())

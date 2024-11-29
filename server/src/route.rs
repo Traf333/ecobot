@@ -25,22 +25,21 @@ pub fn build_buttons(category: &str) -> InlineKeyboardMarkup {
 
     if let Some(children) = &route.children {
         let mut chunked: Vec<Vec<InlineKeyboardButton>> = children
-            .chunks(3)
+            .chunks(2)
             .map(|chunk| {
                 chunk
                     .iter()
                     .map(|child| {
                         log::info!("child: {}", child);
                         let route = ROUTES.get(child).expect("Route not found");
-                        InlineKeyboardButton::callback(
-                            route.label.to_owned(),
-                            route.path.to_owned(),
-                        )
+                        InlineKeyboardButton::callback(&route.label, &route.path)
                     })
                     .collect()
             })
             .collect();
         buttons.append(&mut chunked);
+    } else {
+        buttons.push(vec![InlineKeyboardButton::callback("Назад", "start")]);
     }
     InlineKeyboardMarkup::new(buttons)
 }
