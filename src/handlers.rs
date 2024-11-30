@@ -1,4 +1,4 @@
-use std::{error::Error, fs::read_to_string};
+use std::error::Error;
 
 use log::{error, info};
 use teloxide::{
@@ -10,6 +10,12 @@ use teloxide::{
 };
 
 use crate::route::build_buttons;
+
+use rust_embed::RustEmbed;
+
+#[derive(RustEmbed)]
+#[folder = "src/contents/"] // Path to your contents directory
+struct Contents;
 
 /// These commands are supported:
 #[derive(BotCommands)]
@@ -135,8 +141,12 @@ fn build_details(
     text: &str,
 ) -> Result<(InlineKeyboardMarkup, String), Box<dyn Error + Send + Sync>> {
     let route = text.replace("/", "");
-    let path = format!("{}/src/contents/{}.md", env!("CARGO_MANIFEST_DIR"), &route);
-    let content = read_to_string(path)?;
+    let file_name = format!("{}.md", &route);
+    let content = Contents::get(&file_name)
+        .ok_or_else(|| format!("File {} not found", file_name))?
+        .data;
+
+    let content = String::from_utf8(content.to_vec())?;
     let buttons = build_buttons(&route);
 
     Ok((buttons, escape_markdown_v2(content)))

@@ -9,7 +9,7 @@ use shuttle_runtime::SecretStore;
 use teloxide::prelude::*;
 
 async fn health_check() -> &'static str {
-    "All works fine. Please check @ecokenigbot in Telegram!"
+    "All works fine. Please check @ecokenigbot in tg!"
 }
 
 #[shuttle_runtime::main]
