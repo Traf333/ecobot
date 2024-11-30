@@ -46,7 +46,7 @@
   },
   "dangerous": {
     "path": "/dangerous",
-    "label": "Опасные"
+    "label": "Опасные отходы"
   },
   "other": {
     "path": "/other",
