@@ -19,13 +19,16 @@ jobs:
           toolchain: stable
           profile: minimal
 
-      - name: Cache cargo-shuttle
+      - name: Cache Cargo binaries
         uses: actions/cache@v3
         with:
-          path: ~/.cargo/bin/cargo-shuttle
-          key: ${{ runner.os }}-cargo-shuttle-${{ hashFiles('Cargo.lock') }}
+          path: ~/.cargo/bin
+          key: ${{ runner.os }}-cargo-bin-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-shuttle-
+            ${{ runner.os }}-cargo-bin-
+
+      - name: Add Cargo binaries to PATH
+        run: echo "${HOME}/.cargo/bin" >> $GITHUB_PATH
 
       - name: Install Shuttle CLI if not cached
         run: |
