@@ -12,7 +12,7 @@ use teloxide::{
 use crate::route::build_buttons;
 
 use rust_embed::RustEmbed;
-
+dfafds
 #[derive(RustEmbed)]
 #[folder = "src/contents/"] // Path to your contents directory
 struct Contents;
