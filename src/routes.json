@@ -20,7 +20,7 @@
   },
   "clothes": {
     "path": "/clothes",
-    "label": "Ненужная одежда и обувь"
+    "label": "Одежда и обувь"
   },
   "food": {
     "path": "/food",
@@ -28,11 +28,11 @@
   },
   "books": {
     "path": "/books",
-    "label": "Лишние книги"
+    "label": "Книги"
   },
   "art": {
     "path": "/art",
-    "label": "Разные мелочи, которые могут подойти для творчества"
+    "label": "Мелочи для творчества"
   },
   "recycling": {
     "path": "/recycling",
