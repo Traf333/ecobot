@@ -32,7 +32,7 @@ jobs:
 
       - name: Install Shuttle CLI if not cached
         run: |
-          if ! [ -x "$(command -v cargo-shuttle)" ]; then
+          if ! [ -x "$(command -v shuttle)" ]; then
             cargo install cargo-shuttle
           fi
 
