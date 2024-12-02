@@ -37,9 +37,4 @@ jobs:
         env:
           SHUTTLE_API_KEY: ${{ secrets.SHUTTLE_API_KEY }}
         run: |
-          echo $SHUTTLE_API_KEY
-          echo shuttle project status
-          ecobot=$(shuttle project status | grep ecobot | awk '{print $1}')
-          shuttle deployment list
-          echo $ecobot
           shuttle deploy --name ecobot
