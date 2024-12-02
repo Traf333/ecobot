@@ -6,11 +6,34 @@
   },
   "faq": {
     "path": "/faq",
-    "label": "Частые вопросы"
+    "label": "Что делать, если"
   },
   "give_away": {
     "path": "/give_away",
     "label": "Отдать ненужное"
+    "children": [
+      "clothes",
+      "food",
+      "books",
+      "art"
+    ]
+  },
+  "clothes": {
+    "path": "/clothes",
+    "label": "Ненужная одежда и обувь"
+  },
+  "food": {
+    "path": "/food",
+    "label": "Еда и продукты"
+  },
+  "books": {
+    "path": "/books",
+    "label": "Лишние книги"
+  },
+  "art": {
+    "path": "/art",
+    "label": "Разные мелочи, которые могут подойти для творчества"
+  }
   },
   "recycling": {
     "path": "/recycling",
