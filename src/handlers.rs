@@ -83,6 +83,7 @@ pub async fn message_handler(
                 let (buttons, content) = build_details(text)?;
                 info!("Sending:  content: {}, text: {}", content, text);
                 bot.send_message(msg.chat.id, content)
+                    .disable_web_page_preview(true)
                     .parse_mode(ParseMode::MarkdownV2)
                     .reply_markup(buttons)
                     .await?;
@@ -92,6 +93,7 @@ pub async fn message_handler(
                     "бот" | "Бот" => {
                         let (buttons, content) = build_details("start")?;
                         bot.send_message(msg.chat.id, content)
+                            .disable_web_page_preview(true)
                             .parse_mode(ParseMode::MarkdownV2)
                             .reply_markup(buttons)
                             .await?
@@ -119,9 +121,10 @@ pub async fn callback_handler(
         bot.answer_callback_query(&q.id).await?;
 
         let (buttons, content) = build_details(text)?;
-        // info!("Sending:  content: {}, text: {}", content, text);
+
         match bot
             .send_message(q.from.id, content)
+            .disable_web_page_preview(true)
             .parse_mode(ParseMode::MarkdownV2)
             .reply_markup(buttons)
             .await

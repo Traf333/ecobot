@@ -39,7 +39,7 @@ pub fn build_buttons(category: &str) -> InlineKeyboardMarkup {
             .collect();
         buttons.append(&mut chunked);
     } else {
-        buttons.push(vec![InlineKeyboardButton::callback("Назад", "start")]);
+        buttons.push(vec![InlineKeyboardButton::callback("На Главную", "start")]);
     }
     InlineKeyboardMarkup::new(buttons)
 }
