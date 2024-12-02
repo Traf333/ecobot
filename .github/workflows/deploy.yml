@@ -1,18 +1,34 @@
-name: Deploy
+name: Deploy to Shuttle.rs
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - main # Trigger this workflow on pushes to the main branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: shuttle-hq/deploy-action@main
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
         with:
-          deploy-key: ${{ secrets.SHUTTLE_API_KEY }}
-          name: "ecobot"
-          secrets: |
-            TELOXIDE_TOKEN = '${{ secrets.TELOXIDE_TOKEN }}'
+          toolchain: stable
+          profile: minimal
+
+      - name: Install Shuttle CLI
+        run: cargo install shuttle-service-cli
+
+      - name: Deploy to Shuttle.rs
+        env:
+          SHUTTLE_API_KEY: ${{ secrets.SHUTTLE_API_KEY }} # Add your Shuttle API key to GitHub Secrets
+        run: |
+          echo $SHUTTLE_API_KEY
+          echo shuttle project status
+          ecobot=$(shuttle project status | grep ecobot | awk '{print $1}')
+          shuttle deployment list
+          echo $ecobot
+          shuttle deploy --name ecobot
