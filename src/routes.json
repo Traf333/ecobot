@@ -10,7 +10,7 @@
   },
   "give_away": {
     "path": "/give_away",
-    "label": "Отдать ненужное"
+    "label": "Отдать ненужное",
     "children": [
       "clothes",
       "food",
