@@ -30,7 +30,7 @@ jobs:
           profile: minimal
 
       - name: Install Shuttle CLI
-        run: cargo binstall cargo-shuttle
+        run: cargo install cargo-shuttle
 
       - name: Deploy to Shuttle.rs
         env:
