@@ -12,30 +12,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-
-      - name: Cache Cargo binaries
-        uses: actions/cache@v3
-        with:
-          path: ~/.cargo/bin
-          key: ${{ runner.os }}-cargo-bin-${{ hashFiles('Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-bin-
-
-      - name: Add Cargo binaries to PATH
-        run: echo "${HOME}/.cargo/bin" >> $GITHUB_PATH
-
-      - name: Install Shuttle CLI if not cached
-        run: |
-          if ! [ -x "$(command -v shuttle)" ]; then
-            cargo install cargo-shuttle
-          fi
-
+      # install with cargo-binstall
+      - name: Install cargo-binstall
+        run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+        shell: bash
+      - name: Install cargo-shuttle
+        run: cargo binstall -y --locked cargo-shuttle
+        shell: bash
       - name: Deploy to Shuttle.rs
         env:
           SHUTTLE_API_KEY: ${{ secrets.SHUTTLE_API_KEY }}
