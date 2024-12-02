@@ -6,6 +6,16 @@ on:
       - main # Trigger this workflow on pushes to the main branch
 
 jobs:
+  #   test:
+  #     runs-on: ubuntu-latest
+
+  #     steps:
+  #       - uses: actions/checkout@v4
+  #       - name: Build
+  #         run: cargo build --verbose
+  #       - name: Run tests
+  #         run: cargo test --verbose
+
   deploy:
     runs-on: ubuntu-latest
 
@@ -20,7 +30,7 @@ jobs:
           profile: minimal
 
       - name: Install Shuttle CLI
-        run: cargo install shuttle-service-cli
+        run: cargo binstall cargo-shuttle
 
       - name: Deploy to Shuttle.rs
         env:
