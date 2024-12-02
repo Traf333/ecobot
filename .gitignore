@@ -2,3 +2,4 @@
 .env
 .shuttle*
 Secrets*.toml
+!Secrets.example.toml
