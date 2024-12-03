@@ -2,7 +2,7 @@
   "start": {
     "path": "/",
     "label": "Главная",
-    "children": ["recycling", "give_away", "faq"]
+    "children": ["recycling", "give_away", "faq", "project"]
   },
   "faq": {
     "path": "/faq",
@@ -29,6 +29,10 @@
   "nature": {
     "path": "/nature",
     "label": "🌱 Природа"
+  },
+  "project": {
+    "path": "/project",
+    "label": "О проекте"
   },
   "give_away": {
     "path": "/give_away",
