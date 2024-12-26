@@ -2,15 +2,11 @@
   "start": {
     "path": "/",
     "label": "Главная",
-    "children": ["recycling", "give_away", "faq", "project"]
+    "children": ["recycling", "give_away", "faq"]
   },
   "faq": {
     "path": "/faq",
     "label": "❓ Что делать, если"
-  },
-  "project": {
-    "path": "/project",
-    "label": "О проекте"
   },
   "give_away": {
     "path": "/give_away",
