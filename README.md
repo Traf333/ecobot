@@ -1,4 +1,4 @@
-# Poise Hello World Bot with Shuttle
+# Ecobot (ecokenig bot for getting quick info)
 
 In this example we will deploy a Poise/Serenity bot with Shuttle that responds to the `/hello` command with `world!`. To run this bot we need a valid Discord Token. To get started log in to the [Discord developer portal](https://discord.com/developers/applications).
 
