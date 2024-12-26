@@ -6,7 +6,29 @@
   },
   "faq": {
     "path": "/faq",
-    "label": "❓ Что делать, если"
+    "label": "❓ Что делать, если",
+    "children": [
+      "green_city",
+      "garbage",
+      "animal",
+      "nature"
+    ]
+  },
+  "green_city": {
+    "path": "/green_city",
+    "label": "🌳 Зелёный город"
+  },
+  "garbage": {
+    "path": "/garbage",
+    "label": "🗑 Мусор и РСО"
+  },
+  "animal": {
+    "path": "/animal",
+    "label": "🦆 Животные"
+  },
+  "nature": {
+    "path": "/nature",
+    "label": "🌱 Природа"
   },
   "give_away": {
     "path": "/give_away",
