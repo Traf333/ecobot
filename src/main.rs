@@ -1,12 +1,11 @@
 use axum::{routing::get, Router};
-
-mod handlers;
-mod route;
-
 use handlers::{callback_handler, message_handler};
 
 use shuttle_runtime::SecretStore;
 use teloxide::prelude::*;
+
+mod handlers;
+mod route;
 
 async fn health_check() -> &'static str {
     "All works fine. Please check @ecokenigbot in tg!"
@@ -16,7 +15,18 @@ async fn health_check() -> &'static str {
 async fn axum(#[shuttle_runtime::Secrets] secret_store: SecretStore) -> shuttle_axum::ShuttleAxum {
     let telegram_bot_token = secret_store
         .get("TELOXIDE_TOKEN")
-        .expect("token should be set in secrets");
+        .expect("TELOXIDE_TOKEN should be set in secrets");
+    let sentry_url = secret_store
+        .get("SENTRY_URL")
+        .expect("SENTRY_URL should be set in secrets");
+    let _guard = sentry::init((
+        sentry_url,
+        sentry::ClientOptions {
+            release: sentry::release_name!(),
+            max_breadcrumbs: 50,
+            ..Default::default()
+        },
+    ));
 
     let router = build_router(&telegram_bot_token);
 
