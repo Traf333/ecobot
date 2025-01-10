@@ -61,6 +61,17 @@ pub async fn message_handler(
     me: Me,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     if let Some(text) = msg.text() {
+        sentry::with_scope(
+            |scope| {
+                scope.set_tag("chat_id", msg.chat.id.to_string());
+                scope.set_tag("command", text);
+                scope.set_tag("source", "message");
+            },
+            || {
+                sentry::capture_message(&text, sentry::Level::Info);
+            },
+        );
+
         match BotCommands::parse(text, me.username()) {
             Ok(Command::Help) => {
                 // Just send the description of all commands.
@@ -81,7 +92,7 @@ pub async fn message_handler(
                 | Command::Other,
             ) => {
                 let (buttons, content) = build_details(text)?;
-                info!("Sending:  content: {}, text: {}", content, text);
+
                 bot.send_message(msg.chat.id, content)
                     .disable_web_page_preview(true)
                     .parse_mode(ParseMode::MarkdownV2)
@@ -121,6 +132,16 @@ pub async fn callback_handler(
         bot.answer_callback_query(&q.id).await?;
 
         let (buttons, content) = build_details(text)?;
+        sentry::with_scope(
+            |scope| {
+                scope.set_tag("chat_id", q.from.id.to_string());
+                scope.set_tag("command", text);
+                scope.set_tag("source", "callback");
+            },
+            || {
+                sentry::capture_message(&text, sentry::Level::Info);
+            },
+        );
 
         match bot
             .send_message(q.from.id, content)
