@@ -125,6 +125,7 @@ pub async fn callback_handler(
     bot: Bot,
     q: CallbackQuery,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
+    sentry::capture_message("Test message", sentry::Level::Info);
     if let Some(ref text) = q.data {
         // Tell telegram that we've seen this query, to remove 🕑 icons from the
         // clients. You could also use `answer_callback_query`'s optional
