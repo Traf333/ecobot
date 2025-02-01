@@ -60,7 +60,6 @@
     "path": "/recycling",
     "label": "♻️ Переработка",
     "children": [
-      "pines",
       "plastic",
       "paper",
       "metal",
@@ -69,10 +68,6 @@
       "dangerous",
       "other"
     ]
-  },
-  "pines": {
-    "path": "/pines",
-    "label": "🎄 Ёлки"
   },
   "plastic": {
     "path": "/plastic",
