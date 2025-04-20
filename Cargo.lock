@@ -511,6 +511,7 @@ dependencies = [
  "dotenv",
  "log",
  "once_cell",
+ "reqwest 0.11.27",
  "rust-embed",
  "sentry",
  "serde",

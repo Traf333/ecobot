@@ -103,7 +103,7 @@ pub async fn message_handler(
                     let parts: Vec<&str> = text.split_whitespace().collect();
                     let second_part = if parts.len() > 1 { parts[1] } else { "" };
 
-                    let (buttons, content) = build_details(second_part)?;
+                    let (buttons, content) = build_details(second_part, true)?;
 
                     bot.send_message(ChatId(test_chat_id), content)
                         .disable_web_page_preview(true)
@@ -128,7 +128,7 @@ pub async fn message_handler(
                     let parts: Vec<&str> = text.split_whitespace().collect();
                     let second_part = if parts.len() > 1 { parts[1] } else { "" };
 
-                    let (buttons, content) = build_details(second_part)?;
+                    let (buttons, content) = build_details(second_part, true)?;
 
                     bot.send_message(ChatId(test_chat_id), content)
                         .disable_web_page_preview(true)
@@ -159,7 +159,7 @@ pub async fn message_handler(
                 | Command::Organic
                 | Command::Other,
             ) => {
-                let (buttons, content) = build_details(text)?;
+                let (buttons, content) = build_details(text, false)?;
 
                 bot.send_message(msg.chat.id, content)
                     .disable_web_page_preview(true)
@@ -170,7 +170,7 @@ pub async fn message_handler(
             Err(_) => {
                 match text {
                     "бот" | "Бот" => {
-                        let (buttons, content) = build_details("start")?;
+                        let (buttons, content) = build_details("start", false)?;
                         bot.send_message(msg.chat.id, content)
                             .disable_web_page_preview(true)
                             .parse_mode(ParseMode::MarkdownV2)
@@ -208,7 +208,7 @@ pub async fn callback_handler(
         // parameters to tweak what happens on the client side.
         bot.answer_callback_query(&q.id).await?;
 
-        let (buttons, content) = build_details(text)?;
+        let (buttons, content) = build_details(text, false)?;
         sentry::with_scope(
             |scope| {
                 scope.set_tag("chat_id", q.from.id.to_string());
@@ -240,6 +240,7 @@ pub async fn callback_handler(
 
 fn build_details(
     text: &str,
+    is_external: bool,
 ) -> Result<(InlineKeyboardMarkup, String), Box<dyn Error + Send + Sync>> {
     let route = text.replace("/", "");
     let file_name = format!("{}.md", &route);
@@ -248,7 +249,7 @@ fn build_details(
         .data;
 
     let content = String::from_utf8(content.to_vec())?;
-    let buttons = build_buttons(&route);
+    let buttons = build_buttons(&route, is_external);
 
     Ok((buttons, escape_markdown_v2(content)))
 }

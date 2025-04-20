@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use once_cell::sync::Lazy;
+use reqwest::Url;
 use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
 
 pub static ROUTES: Lazy<HashMap<String, Route>> = Lazy::new(|| routes().unwrap());
@@ -11,6 +12,7 @@ pub struct Route {
     pub path: String,
     pub label: String,
     pub children: Option<Vec<String>>,
+    pub external: Option<Vec<String>>,
 }
 
 pub fn routes() -> Result<HashMap<String, Route>, serde_json::Error> {
@@ -18,7 +20,7 @@ pub fn routes() -> Result<HashMap<String, Route>, serde_json::Error> {
     Ok(routes)
 }
 
-pub fn build_buttons(category: &str) -> InlineKeyboardMarkup {
+pub fn build_buttons(category: &str, is_external: bool) -> InlineKeyboardMarkup {
     let mut buttons: Vec<Vec<InlineKeyboardButton>> = vec![];
 
     let route = ROUTES.get(category).expect("Route not found");
@@ -39,7 +41,14 @@ pub fn build_buttons(category: &str) -> InlineKeyboardMarkup {
             .collect();
         buttons.append(&mut chunked);
     } else {
-        buttons.push(vec![InlineKeyboardButton::callback("На Главную", "start")]);
+        if is_external {
+            if let Some(external) = &route.external {
+                let url = Url::parse(&external[1]).unwrap();
+                buttons.push(vec![InlineKeyboardButton::url(&external[0], url)]);
+            }
+        } else {
+            buttons.push(vec![InlineKeyboardButton::callback("На Главную", "start")]);
+        }
     }
     InlineKeyboardMarkup::new(buttons)
 }
