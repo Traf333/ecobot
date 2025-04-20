@@ -6,6 +6,7 @@ use teloxide::prelude::*;
 
 mod handlers;
 mod route;
+mod users;
 
 async fn health_check() -> &'static str {
     "All works fine. Please check @ecokenigbot in tg!"
