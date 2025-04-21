@@ -1,7 +1,5 @@
+use crate::db;
 use anyhow::Result;
-use once_cell::sync::Lazy;
-use std::collections::HashSet;
-use std::sync::Mutex;
 use teloxide::{
     payloads::SendMessageSetters,
     prelude::Requester,
@@ -9,25 +7,19 @@ use teloxide::{
     Bot,
 };
 
-// Global static set to store user IDs
-pub static USERS: Lazy<Mutex<HashSet<i64>>> = Lazy::new(|| Mutex::new(HashSet::new()));
-
 /// Store a user ID in the database
-pub fn store_user(user_id: i64) -> bool {
-    let mut users = USERS.lock().unwrap();
-    users.insert(user_id)
+pub async fn store_user(user_id: i64) -> Result<bool> {
+    db::store_user(user_id).await
 }
 
 /// Check if a user ID is already stored
-pub fn is_user_stored(user_id: i64) -> bool {
-    let users = USERS.lock().unwrap();
-    users.contains(&user_id)
+pub async fn is_user_stored(user_id: i64) -> Result<bool> {
+    db::is_user_stored(user_id).await
 }
 
 /// Get all stored user IDs
-pub fn get_all_users() -> Vec<i64> {
-    let users = USERS.lock().unwrap();
-    users.iter().copied().collect()
+pub async fn get_all_users() -> Result<Vec<i64>> {
+    db::get_all_users().await
 }
 
 /// Send a message to a specific user
@@ -55,7 +47,7 @@ pub async fn broadcast_message(
     message: &str,
     markdown: bool,
 ) -> Result<(usize, Vec<i64>)> {
-    let users = get_all_users();
+    let users = get_all_users().await?;
     let mut success_count = 0;
     let mut failed_users = Vec::new();
 

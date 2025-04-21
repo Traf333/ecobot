@@ -4,6 +4,7 @@ use handlers::{callback_handler, message_handler};
 use shuttle_runtime::SecretStore;
 use teloxide::prelude::*;
 
+mod db;
 mod handlers;
 mod route;
 mod users;
@@ -21,6 +22,9 @@ async fn axum(#[shuttle_runtime::Secrets] secret_store: SecretStore) -> shuttle_
         .get("SENTRY_URL")
         .expect("SENTRY_URL should be set in secrets");
 
+    db::connect_db(secret_store)
+        .await
+        .expect("Database connection fails");
     let router = build_router(&telegram_bot_token, sentry_url);
 
     Ok(router.into())
@@ -33,16 +37,6 @@ fn build_router(token: &str, sentry_url: String) -> Router {
         .branch(Update::filter_callback_query().endpoint(callback_handler));
 
     tokio::spawn(async move {
-        log::info!("Starting ecobot...");
-        let _guard = sentry::init((
-            sentry_url,
-            sentry::ClientOptions {
-                release: sentry::release_name!(),
-                max_breadcrumbs: 50,
-                ..Default::default()
-            },
-        ));
-
         Dispatcher::builder(bot, handler)
             .enable_ctrlc_handler()
             .build()

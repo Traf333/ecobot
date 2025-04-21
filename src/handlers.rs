@@ -1,4 +1,7 @@
 use std::error::Error;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
+use std::path::Path;
 
 use log::{error, info};
 use teloxide::{
@@ -9,9 +12,9 @@ use teloxide::{
     Bot,
 };
 
-use crate::users;
-
+use crate::db;
 use crate::route::build_buttons;
+use crate::users;
 
 use rust_embed::RustEmbed;
 
@@ -72,24 +75,14 @@ pub async fn message_handler(
     // Store user ID
     if let Some(user) = msg.from() {
         let user_id = user.id.0;
-        let is_new_user = users::store_user(user_id.try_into().unwrap());
-        if is_new_user {
-            info!("New user registered from message: {}", user_id);
+        if let Ok(is_new_user) = users::store_user(user_id.try_into().unwrap()).await {
+            if is_new_user {
+                info!("New user registered from message: {}", user_id);
+            }
         }
     }
 
     if let Some(text) = msg.text() {
-        sentry::with_scope(
-            |scope| {
-                scope.set_tag("chat_id", msg.chat.id.to_string());
-                scope.set_tag("command", text);
-                scope.set_tag("source", "message");
-            },
-            || {
-                sentry::capture_message(&text, sentry::Level::Info);
-            },
-        );
-
         match BotCommands::parse(text, me.username()) {
             Ok(Command::Help) => {
                 // Just send the description of all commands.
@@ -197,9 +190,10 @@ pub async fn callback_handler(
 
     // Store user ID
     let user_id = q.from.id.0;
-    let is_new_user = users::store_user(user_id.try_into().unwrap());
-    if is_new_user {
-        info!("New user registered from callback: {}", user_id);
+    if let Ok(is_new_user) = users::store_user(user_id.try_into().unwrap()).await {
+        if is_new_user {
+            info!("New user registered from callback: {}", user_id);
+        }
     }
 
     if let Some(ref text) = q.data {
@@ -209,16 +203,6 @@ pub async fn callback_handler(
         bot.answer_callback_query(&q.id).await?;
 
         let (buttons, content) = build_details(text, false)?;
-        sentry::with_scope(
-            |scope| {
-                scope.set_tag("chat_id", q.from.id.to_string());
-                scope.set_tag("command", text);
-                scope.set_tag("source", "callback");
-            },
-            || {
-                sentry::capture_message(&text, sentry::Level::Info);
-            },
-        );
 
         match bot
             .send_message(q.from.id, content)
