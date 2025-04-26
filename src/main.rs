@@ -13,7 +13,7 @@ async fn main() -> anyhow::Result<()> {
     // Load environment variables from .env file
     dotenv().ok();
     env_logger::init();
-
+    log::info!("Starting bot");
     // Get environment variables
     let telegram_bot_token =
         env::var("TELOXIDE_TOKEN").expect("TELOXIDE_TOKEN should be set in environment");
