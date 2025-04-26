@@ -20,9 +20,7 @@ pub async fn connect_db() -> surrealdb::Result<()> {
     let namespace = env::var("NAMESPACE").expect("NAMESPACE must be set in environment");
     let dbname = env::var("DBNAME").expect("DBNAME must be set in environment");
 
-    let _ = DB
-        .connect::<Ws>(&format!("{url}:{port}"))
-        .await?;
+    let _ = DB.connect::<Ws>(&format!("{url}:{port}")).await?;
 
     let _ = DB
         .signin(Root {
@@ -31,10 +29,7 @@ pub async fn connect_db() -> surrealdb::Result<()> {
         })
         .await?;
 
-    let _ = DB
-        .use_ns(&namespace)
-        .use_db(&dbname)
-        .await?;
+    let _ = DB.use_ns(&namespace).use_db(&dbname).await?;
 
     Ok(())
 }
@@ -70,7 +65,7 @@ pub async fn store_user(user_id: i64) -> Result<bool> {
         .content(user)
         .await
         .map_err(|e| anyhow!("Failed to create user: {}", e))?;
-
+    log::info!("User {} created", user_id);
     Ok(created.is_some())
 }
 
