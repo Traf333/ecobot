@@ -195,6 +195,7 @@ pub async fn callback_handler(
     }
 
     if let Some(ref text) = q.data {
+        log::info!("callback: {}", text);
         // Tell telegram that we've seen this query, to remove 🕑 icons from the
         // clients. You could also use `answer_callback_query`'s optional
         // parameters to tweak what happens on the client side.

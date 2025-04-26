@@ -24,7 +24,7 @@ pub fn build_buttons(category: &str, is_external: bool) -> InlineKeyboardMarkup 
     let mut buttons: Vec<Vec<InlineKeyboardButton>> = vec![];
 
     let route = ROUTES.get(category).expect("Route not found");
-
+    log::info!("category: {}", category);
     if let Some(children) = &route.children {
         let mut chunked: Vec<Vec<InlineKeyboardButton>> = children
             .chunks(2)
@@ -32,7 +32,6 @@ pub fn build_buttons(category: &str, is_external: bool) -> InlineKeyboardMarkup 
                 chunk
                     .iter()
                     .map(|child| {
-                        log::info!("child: {}", child);
                         let route = ROUTES.get(child).expect("Route not found");
                         InlineKeyboardButton::callback(&route.label, &route.path)
                     })
