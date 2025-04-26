@@ -2,7 +2,7 @@ use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
-use shuttle_runtime::SecretStore;
+use std::env;
 use surrealdb::{
     engine::remote::ws::{Client, Ws},
     opt::auth::Root,
@@ -12,33 +12,28 @@ use surrealdb::{
 
 pub static DB: Lazy<Surreal<Client>> = Lazy::new(Surreal::init);
 
-pub async fn connect_db(secrets: SecretStore) -> surrealdb::Result<()> {
+pub async fn connect_db() -> surrealdb::Result<()> {
+    let url = env::var("URL").expect("URL must be set in environment");
+    let port = env::var("PORT").expect("PORT must be set in environment");
+    let username = env::var("USERNAME").expect("USERNAME must be set in environment");
+    let password = env::var("PASSWORD").expect("PASSWORD must be set in environment");
+    let namespace = env::var("NAMESPACE").expect("NAMESPACE must be set in environment");
+    let dbname = env::var("DBNAME").expect("DBNAME must be set in environment");
+
     let _ = DB
-        .connect::<Ws>(&format!(
-            "{}:{}",
-            &secrets.get("URL").expect("database url should be set"),
-            &secrets.get("PORT").expect("database port should be set")
-        ))
+        .connect::<Ws>(&format!("{url}:{port}"))
         .await?;
 
     let _ = DB
         .signin(Root {
-            username: &secrets
-                .get("USERNAME")
-                .expect("database username should be set"),
-            password: &secrets
-                .get("PASSWORD")
-                .expect("database password should be set"),
+            username: &username,
+            password: &password,
         })
         .await?;
 
     let _ = DB
-        .use_ns(
-            &secrets
-                .get("NAMESPACE")
-                .expect("database namespace should be set"),
-        )
-        .use_db(&secrets.get("DBNAME").expect("database name should be set"))
+        .use_ns(&namespace)
+        .use_db(&dbname)
         .await?;
 
     Ok(())

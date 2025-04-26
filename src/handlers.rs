@@ -186,8 +186,6 @@ pub async fn callback_handler(
     bot: Bot,
     q: CallbackQuery,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    sentry::capture_message("Test message", sentry::Level::Info);
-
     // Store user ID
     let user_id = q.from.id.0;
     if let Ok(is_new_user) = users::store_user(user_id.try_into().unwrap()).await {
