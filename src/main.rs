@@ -10,15 +10,13 @@ mod users;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    // Load environment variables from .env file
     dotenv().ok();
     env_logger::init();
-    log::info!("Starting bot");
-    // Get environment variables
+    log::info!("Starting bot at time: {}", chrono::Local::now());
+
     let telegram_bot_token =
         env::var("TELOXIDE_TOKEN").expect("TELOXIDE_TOKEN should be set in environment");
 
-    // Connect to database
     db::connect_db().await.expect("Database connection fails");
 
     let bot = Bot::new(&telegram_bot_token);
