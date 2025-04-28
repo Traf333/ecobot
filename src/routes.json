@@ -97,13 +97,9 @@
     "path": "/other",
     "label": "Другое"
   },
-  "anons": {
-    "path": "/anons",
-    "label": "Анонс"
-  },
   "anons1": {
-    "path": "/anons1",
-    "label": "Анонс1",
+    "path": "/kolyovska",
+    "label": "Кольовска",
     "external": [
       "Регистрация", "https://forms.gle/uebDwfNxBYf9TLrX7"
     ]
