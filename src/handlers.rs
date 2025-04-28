@@ -90,19 +90,23 @@ pub async fn message_handler(
                     .await?;
             }
             Ok(Command::Broadcast) => {
-                // Send a test message to the specific chat ID
-                let test_chat_id = 108609383; // The user's chat ID for testing
                 if msg.chat.id == ChatId(ADMIN_ID) {
                     let parts: Vec<&str> = text.split_whitespace().collect();
                     let second_part = if parts.len() > 1 { parts[1] } else { "" };
 
                     let (buttons, content) = build_details(second_part, true)?;
-
-                    bot.send_message(ChatId(test_chat_id), content)
-                        .disable_web_page_preview(true)
-                        .parse_mode(ParseMode::MarkdownV2)
-                        .reply_markup(buttons)
-                        .await?;
+                    // get all users and send
+                    let users = users::get_all_users().await?;
+                    for user_id in users {
+                        log::info!("broadcasting to user: {}", user_id);
+                        bot.send_message(ChatId(user_id), &content)
+                            .disable_web_page_preview(true)
+                            .parse_mode(ParseMode::MarkdownV2)
+                            .reply_markup(buttons.clone())
+                            .await?;
+                        // sleep 2 seconds
+                        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                    }
                 } else {
                     bot.send_message(
                         msg.chat.id,
