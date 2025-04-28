@@ -93,17 +93,37 @@ pub async fn message_handler(
                 if msg.chat.id == ChatId(ADMIN_ID) {
                     let parts: Vec<&str> = text.split_whitespace().collect();
                     let second_part = if parts.len() > 1 { parts[1] } else { "" };
-
+                    let whitelisted_ids: Vec<i64> = vec![
+                        1137539828, 245300509, 480442732, 108609383, 370942991, 912211086,
+                        1030476206, 439366454, 828969293, 262894147, 473789332, 393940845,
+                        5065333159, 1067873349, 683464776, 835102541, 6471579202, 6467162272,
+                    ];
                     let (buttons, content) = build_details(second_part, true)?;
                     // get all users and send
                     let users = users::get_all_users().await?;
                     for user_id in users {
+                        if !whitelisted_ids.contains(&user_id) {
+                            continue;
+                        }
                         log::info!("broadcasting to user: {}", user_id);
-                        bot.send_message(ChatId(user_id), &content)
+                        match bot
+                            .send_message(ChatId(user_id), &content)
                             .disable_web_page_preview(true)
                             .parse_mode(ParseMode::MarkdownV2)
                             .reply_markup(buttons.clone())
-                            .await?;
+                            .await
+                        {
+                            Ok(_) => log::info!("Message sent to user: {}", user_id),
+                            Err(err) => {
+                                log::error!(
+                                    "Failed to send message to user {}: {:?}",
+                                    user_id,
+                                    err
+                                );
+                                // Continue with the next user if this one has errors
+                                continue;
+                            }
+                        };
                         // sleep 2 seconds
                         tokio::time::sleep(std::time::Duration::from_secs(2)).await;
                     }
