@@ -105,7 +105,7 @@ pub async fn message_handler(
                         if blacklisted_ids.contains(&user_id) {
                             continue;
                         }
-                        log::info!("broadcasting to user: {}", user_id);
+
                         match bot
                             .send_message(ChatId(user_id), &content)
                             .disable_web_page_preview(true)
