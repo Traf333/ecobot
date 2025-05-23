@@ -2,7 +2,11 @@
   "start": {
     "path": "/",
     "label": "Главная",
-    "children": ["recycling", "give_away", "faq"]
+    "children": ["summerecodvor25", "recycling", "give_away", "faq"]
+  },
+  "summerecodvor25": {
+    "path": "/summerecodvor25",
+    "label": "Экодвор 1 июня"
   },
   "faq": {
     "path": "/faq",
