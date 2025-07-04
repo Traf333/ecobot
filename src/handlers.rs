@@ -92,7 +92,7 @@ pub async fn message_handler(
             .map(|bin_location| format!("{}\n{}", bin_location.latitude, bin_location.longitude))
             .collect::<Vec<String>>()
             .join("\n\n");
-        bot.send_message(msg.chat.id, content)
+        bot.send_message(msg.chat.id, escape_markdown_v2(content))
             .disable_web_page_preview(true)
             .parse_mode(ParseMode::MarkdownV2)
             .await?;
