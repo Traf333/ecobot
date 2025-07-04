@@ -85,7 +85,7 @@ pub async fn message_handler(
     if let Some(location) = msg.location() {
         let latitude = location.latitude;
         let longitude = location.longitude;
-
+        log::info!("Location received: {} {}", latitude, longitude);
         let bin_locations = db::get_bin_locations(latitude, longitude).await?;
         let content = bin_locations
             .into_iter()
