@@ -89,7 +89,12 @@ pub async fn message_handler(
         let bin_locations = db::get_bin_locations(latitude, longitude).await?;
         let content = bin_locations
             .into_iter()
-            .map(|bin_location| format!("{}\n{}", bin_location.latitude, bin_location.longitude))
+            .map(|bin_location| {
+                format!(
+                    "{}\n{}\n{}",
+                    bin_location.latitude, bin_location.longitude, bin_location.address
+                )
+            })
             .collect::<Vec<String>>()
             .join("\n\n");
         bot.send_message(msg.chat.id, escape_markdown_v2(content))
