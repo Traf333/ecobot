@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+#![allow(unused)]
+
 use dotenv::dotenv;
 use handlers::{callback_handler, message_handler};
 use std::env;
