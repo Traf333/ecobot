@@ -5,6 +5,7 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 
 use log::{error, info};
+use teloxide::types::InlineKeyboardButton;
 use teloxide::{
     payloads::SendMessageSetters,
     prelude::Requester,
@@ -88,21 +89,28 @@ pub async fn message_handler(
         let longitude = location.longitude;
         log::info!("Location received: {} {}", latitude, longitude);
         let bin_locations = db::get_bin_locations(latitude, longitude).await?;
+        if bin_locations.is_empty() {
+            bot.send_message(msg.chat.id, "Ближайших контейнеров не найдено")
+                .await?;
+            return Ok(());
+        }
         // pick only first two
         let bin_locations = bin_locations.into_iter().take(2);
-        let content = bin_locations
-            .into_iter()
-            .map(|(distance, bin_location)| {
-                // round distance to integer
-                let distance = (distance * 1000.0).round();
-                format!("{} м {}", distance, bin_location.address)
-            })
-            .collect::<Vec<String>>()
-            .join("\n\n");
-        bot.send_message(msg.chat.id, escape_markdown_v2(content))
-            .disable_web_page_preview(true)
-            .parse_mode(ParseMode::MarkdownV2)
-            .await?;
+
+        for (distance, bin_location) in bin_locations {
+            let distance = distance;
+            let bin_location = bin_location;
+
+            let link_url = "https://yandex.ru/maps/?text=Калининград, " + bin_location.address;
+            let content = format!("{} м {}", distance, bin_location.address);
+            bot.send_message(msg.chat.id, escape_markdown_v2(content))
+                .disable_web_page_preview(true)
+                .parse_mode(ParseMode::MarkdownV2)
+                .reply_markup(InlineKeyboardMarkup::new(vec![vec![
+                    InlineKeyboardButton::url("Открыть в Яндекс.Карты", link_url),
+                ]]))
+                .await?;
+        }
 
         return Ok(());
     }
