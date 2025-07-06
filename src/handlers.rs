@@ -91,7 +91,7 @@ pub async fn message_handler(
             .into_iter()
             .map(|bin_location| {
                 format!(
-                    "{}\n{}\n{}",
+                    "{},{} - {}",
                     bin_location.latitude, bin_location.longitude, bin_location.address
                 )
             })
