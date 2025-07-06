@@ -39,7 +39,7 @@ pub async fn create_bin_location(
     Ok(new_location.is_some())
 }
 
-pub async fn get_bin_locations(latitude: f64, longitude: f64) -> Result<Vec<BinLocation>> {
+pub async fn get_bin_locations(latitude: f64, longitude: f64) -> Result<Vec<(f64, BinLocation)>> {
     let sql = r#"
     SELECT * FROM bin_location
     WHERE $word NOT IN address
@@ -60,9 +60,11 @@ pub async fn get_bin_locations(latitude: f64, longitude: f64) -> Result<Vec<BinL
         let distance = distance(point_a, point_b, Unit::Kilometers);
 
         if distance <= radius {
-            filtered_bin_locations.push(bin_location);
+            filtered_bin_locations.push((distance, bin_location));
         }
     }
+    filtered_bin_locations
+        .sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
     Ok(filtered_bin_locations)
 }
 

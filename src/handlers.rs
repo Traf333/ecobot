@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fs::File;
+use std::i64;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
@@ -87,13 +88,14 @@ pub async fn message_handler(
         let longitude = location.longitude;
         log::info!("Location received: {} {}", latitude, longitude);
         let bin_locations = db::get_bin_locations(latitude, longitude).await?;
+        // pick only first two
+        let bin_locations = bin_locations.into_iter().take(2);
         let content = bin_locations
             .into_iter()
-            .map(|bin_location| {
-                format!(
-                    "{},{} - {}",
-                    bin_location.latitude, bin_location.longitude, bin_location.address
-                )
+            .map(|(distance, bin_location)| {
+                // round distance to integer
+                let distance = (distance * 1000.0).round();
+                format!("{} м {}", distance, bin_location.address)
             })
             .collect::<Vec<String>>()
             .join("\n\n");
