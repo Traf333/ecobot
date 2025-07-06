@@ -106,7 +106,7 @@ pub async fn message_handler(
                 "https://yandex.ru/maps/?rtext={},{}~{},{}",
                 latitude, longitude, bin_location.latitude, bin_location.longitude
             );
-            let content = format!("{} м {}", distance, bin_location.address);
+            let content = format!("{} м {}", (distance * 1000.0).round(), bin_location.address);
             bot.send_message(msg.chat.id, escape_markdown_v2(content))
                 .disable_web_page_preview(true)
                 .parse_mode(ParseMode::MarkdownV2)
