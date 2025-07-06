@@ -5,6 +5,7 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 
 use log::{error, info};
+use reqwest::Url;
 use teloxide::types::InlineKeyboardButton;
 use teloxide::{
     payloads::SendMessageSetters,
@@ -101,13 +102,16 @@ pub async fn message_handler(
             let distance = distance;
             let bin_location = bin_location;
 
-            let link_url = "https://yandex.ru/maps/?text=Калининград, " + bin_location.address;
+            let link_url = format!(
+                "https://yandex.ru/maps/?text=Калининград, {}",
+                bin_location.address
+            );
             let content = format!("{} м {}", distance, bin_location.address);
             bot.send_message(msg.chat.id, escape_markdown_v2(content))
                 .disable_web_page_preview(true)
                 .parse_mode(ParseMode::MarkdownV2)
                 .reply_markup(InlineKeyboardMarkup::new(vec![vec![
-                    InlineKeyboardButton::url("Открыть в Яндекс.Карты", link_url),
+                    InlineKeyboardButton::url("Открыть в Яндекс.Карты", Url::parse(&link_url)?),
                 ]]))
                 .await?;
         }
