@@ -20,26 +20,45 @@ struct CreateBinLocation {
     latitude: f64,
     longitude: f64,
     address: String,
+    preset: String,
 }
 
-pub async fn create_bin_location(latitude: f64, longitude: f64, address: String) -> Result<bool> {
+pub async fn create_bin_location(
+    latitude: f64,
+    longitude: f64,
+    address: String,
+    preset: String,
+) -> Result<bool> {
     let bin_location = CreateBinLocation {
         latitude,
         longitude,
         address,
+        preset,
     };
     let new_location: Option<BinLocation> = DB.create("bin_location").content(bin_location).await?;
     Ok(new_location.is_some())
 }
 
 pub async fn get_bin_locations(latitude: f64, longitude: f64) -> Result<Vec<BinLocation>> {
-    let bin_locations: Vec<BinLocation> = DB.select("bin_location").await?;
+    let sql = r#"
+    SELECT * FROM bin_location
+    WHERE address NOT CONTAINSINSENSITIVE $word
+      AND preset != $preset;
+    "#;
+
+    let mut response = DB
+        .query(sql)
+        .bind(("word", "Советск"))
+        .bind(("preset", "islands#darkOrangeIcon"))
+        .await?;
+    let bins: Vec<BinLocation> = response.take(0)?;
     let radius = 10.0;
     let point_a = Point::new(latitude, longitude);
     let mut filtered_bin_locations = Vec::new();
-    for bin_location in bin_locations {
+    for bin_location in bins {
         let point_b = Point::new(bin_location.latitude, bin_location.longitude);
         let distance = distance(point_a, point_b, Unit::Kilometers);
+        println!("Distance: {}", distance);
         if distance <= radius {
             filtered_bin_locations.push(bin_location);
         }
@@ -95,56 +114,22 @@ pub async fn store_esso_points() -> Result<bool> {
 
     // remove all bin locations
     DB.query("DELETE FROM bin_location").await?;
+    let result = features
+        .into_iter()
+        .map(|feature| {
+            return serde_json::json!({
+                "latitude": feature.geometry.coordinates[1],
+                "longitude": feature.geometry.coordinates[0],
+                "address": feature.properties.iconCaption,
+                "preset": feature.options.preset
+            });
+        })
+        .collect::<Vec<serde_json::Value>>();
 
-    // Prepare a vector to collect all bin locations that meet our criteria
-    let mut bin_locations = Vec::new();
+    let sql = "INSERT INTO bin_location $data;";
+    let mut response = DB.query(sql).bind(("data", result)).await?;
 
-    // Process each feature
-    for feature in features {
-        total_count += 1;
-
-        // Extract properties
-        let properties = feature.properties;
-
-        // Extract icon caption (address)
-        let address = properties.iconCaption;
-
-        // Extract coordinates
-        let coordinates = feature.geometry.coordinates;
-
-        let longitude = coordinates[0];
-        let latitude = coordinates[1];
-
-        // Extract preset (icon color)
-        let options = feature.options;
-
-        let preset = options.preset;
-
-        // Filter out points with "Советск" in the address or yellow icon preset
-        if !address.contains("Советск") && !preset.contains("yellow") {
-            // Create bin location
-            let bin_location = CreateBinLocation {
-                latitude,
-                longitude,
-                address,
-            };
-
-            // Add to our collection
-            bin_locations.push(bin_location);
-            success_count += 1;
-        }
-    }
-
-    // Create all bin locations at once with a single query
-    if !bin_locations.is_empty() {
-        let locations_count = bin_locations.len();
-        let sql = "CREATE bin_location CONTENT $data;";
-        match DB.query(sql).bind(("data", bin_locations)).await {
-            Ok(_) => log::info!("Successfully created {} bin locations", locations_count),
-            Err(e) => log::error!("Failed to create bin locations: {}", e),
-        }
-    }
-
-    println!("Stored {success_count} out of {total_count} points");
-    Ok(success_count > 0)
+    let inserted: Vec<BinLocation> = response.take(0)?;
+    println!("Inserted {} records", inserted.len());
+    Ok(true)
 }
