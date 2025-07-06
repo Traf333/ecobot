@@ -42,7 +42,7 @@ pub async fn create_bin_location(
 pub async fn get_bin_locations(latitude: f64, longitude: f64) -> Result<Vec<BinLocation>> {
     let sql = r#"
     SELECT * FROM bin_location
-    WHERE address NOT CONTAINSINSENSITIVE $word
+    WHERE $word NOT IN address
       AND preset != $preset;
     "#;
 
@@ -52,13 +52,13 @@ pub async fn get_bin_locations(latitude: f64, longitude: f64) -> Result<Vec<BinL
         .bind(("preset", "islands#darkOrangeIcon"))
         .await?;
     let bins: Vec<BinLocation> = response.take(0)?;
-    let radius = 10.0;
+    let radius = 1.0;
     let point_a = Point::new(latitude, longitude);
     let mut filtered_bin_locations = Vec::new();
     for bin_location in bins {
         let point_b = Point::new(bin_location.latitude, bin_location.longitude);
         let distance = distance(point_a, point_b, Unit::Kilometers);
-        println!("Distance: {}", distance);
+
         if distance <= radius {
             filtered_bin_locations.push(bin_location);
         }
