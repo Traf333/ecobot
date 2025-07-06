@@ -103,8 +103,8 @@ pub async fn message_handler(
             let bin_location = bin_location;
 
             let link_url = format!(
-                "https://yandex.ru/maps/?text=Калининград, {}",
-                bin_location.address
+                "https://yandex.ru/maps/?rtext={},{}~Калининград, {}",
+                latitude, longitude, bin_location.address
             );
             let content = format!("{} м {}", distance, bin_location.address);
             bot.send_message(msg.chat.id, escape_markdown_v2(content))
