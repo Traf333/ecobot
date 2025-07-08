@@ -131,9 +131,10 @@ pub async fn message_handler(
         }
 
         if rspko_bins.is_empty() {
-            content = "*Сетки для сбора пластика в радиусе 1 км не найдены*".to_string();
+            content.push_str("\n\n*Сетки для сбора пластика в радиусе 1 км не найдены*\n");
+            content.push_str("👉 Проверить по адресу [на сайте обслуживающей компании РСПО КО](https://rspoko.ru/cbor-othodov-plastika-ot-naseleniya)");
         } else {
-            content = "*Ближайшие сетки для сбора пластика:*".to_string();
+            content.push_str("\n\n*Ближайшие сетки для сбора пластика:*\n");
             for (distance, bin_location) in rspko_bins.into_iter().take(2) {
                 let distance = distance;
                 let bin_location = bin_location;
@@ -143,7 +144,7 @@ pub async fn message_handler(
                     latitude, longitude, bin_location.latitude, bin_location.longitude
                 );
                 let bin_text = format!(
-                    "\n{} м [{}]({})",
+                    "\n{}м [{}]({})",
                     (distance * 1000.0).round(),
                     bin_location.address,
                     link_url
@@ -153,7 +154,7 @@ pub async fn message_handler(
         }
 
         content.push_str(
-            "\nОтправьте новую геопозицию, если хотите найти другие контейнеры.\nОтправьте «Бот», если хотите вернуться в начало.",
+            "\n\nОтправьте новую геопозицию, если хотите найти другие контейнеры.\nОтправьте «Бот», если хотите вернуться в начало.",
         );
 
         bot.send_message(msg.chat.id, escape_markdown_v2(content))
