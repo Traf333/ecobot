@@ -13,6 +13,7 @@ pub struct BinLocation {
     pub latitude: f64,
     pub longitude: f64,
     pub address: String,
+    pub preset: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -20,23 +21,6 @@ struct CreateBinLocation {
     latitude: f64,
     longitude: f64,
     address: String,
-    preset: String,
-}
-
-pub async fn create_bin_location(
-    latitude: f64,
-    longitude: f64,
-    address: String,
-    preset: String,
-) -> Result<bool> {
-    let bin_location = CreateBinLocation {
-        latitude,
-        longitude,
-        address,
-        preset,
-    };
-    let new_location: Option<BinLocation> = DB.create("bin_location").content(bin_location).await?;
-    Ok(new_location.is_some())
 }
 
 pub async fn get_bin_locations(latitude: f64, longitude: f64) -> Result<Vec<(f64, BinLocation)>> {
@@ -124,6 +108,36 @@ pub async fn store_esso_points() -> Result<bool> {
                 "longitude": feature.geometry.coordinates[0],
                 "address": feature.properties.iconCaption,
                 "preset": feature.options.preset
+            });
+        })
+        .collect::<Vec<serde_json::Value>>();
+
+    let sql = "INSERT INTO bin_location $data;";
+    let mut response = DB.query(sql).bind(("data", result)).await?;
+
+    let inserted: Vec<BinLocation> = response.take(0)?;
+    println!("Inserted {} records", inserted.len());
+    Ok(true)
+}
+
+pub async fn store_rspko_points() -> Result<bool> {
+    println!("Synchronising RSPKO points");
+
+    let file = File::open("rspko.json").expect("Failed to open rspko.json");
+    let reader = BufReader::new(file);
+    let features: Vec<CreateBinLocation> = serde_json::from_reader(reader).unwrap();
+
+    let mut success_count = 0;
+    let mut total_count = 0;
+
+    let result = features
+        .into_iter()
+        .map(|feature| {
+            return serde_json::json!({
+                "latitude": feature.latitude,
+                "longitude": feature.longitude,
+                "address": feature.address,
+                "preset": "setka"
             });
         })
         .collect::<Vec<serde_json::Value>>();
