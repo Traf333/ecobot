@@ -94,11 +94,10 @@ pub async fn message_handler(
         let mut content = "".to_string();
 
         if bin_locations.is_empty() {
-            content =
-                "*3\\- и 4\\-секционные контейнеры РСО в радиусе 1 км не найдены.*".to_string();
+            content = "*3- и 4-секционные контейнеры РСО в радиусе 1 км не найдены.*".to_string();
             content.push_str("\n👉 Проверить самостоятельно [на сайте обслуживающей компании ЕСОО](https://new.esoo39.ru/%d1%80%d1%81%d0%be/)");
         } else {
-            content = "*Ближайшие 3\\- и 4\\-секционные контейнеры РСО:*".to_string();
+            content = "*Ближайшие 3- и 4-секционные контейнеры РСО:*".to_string();
             for (distance, bin_location) in bin_locations.into_iter().take(2) {
                 let distance = distance;
                 let bin_location = bin_location;

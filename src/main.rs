@@ -21,9 +21,9 @@ async fn main() -> anyhow::Result<()> {
         env::var("TELOXIDE_TOKEN").expect("TELOXIDE_TOKEN should be set in environment");
 
     db::connect_db().await.expect("Database connection fails");
-    db::store_esso_points()
-        .await
-        .expect("Failed to store ESSO points");
+    // db::store_esso_points()
+    //     .await
+    //     .expect("Failed to store ESSO points");
 
     let bot = Bot::new(&telegram_bot_token);
     let handler = dptree::entry()
