@@ -100,6 +100,14 @@ pub async fn store_esso_points() -> Result<bool> {
 
     // remove all bin locations
     DB.query("DELETE FROM bin_location").await?;
+
+    let initial_point = serde_json::json!({
+        "latitude": 54.697953,
+        "longitude": 20.470404,
+        "address": "Причальная 5‑я улица, 2а",
+        "preset": "all"
+    });
+
     let result = features
         .into_iter()
         .map(|feature| {
@@ -112,38 +120,10 @@ pub async fn store_esso_points() -> Result<bool> {
         })
         .collect::<Vec<serde_json::Value>>();
 
+    let mut data = vec![initial_point];
+    data.extend(result);
     let sql = "INSERT INTO bin_location $data;";
-    let mut response = DB.query(sql).bind(("data", result)).await?;
-
-    let inserted: Vec<BinLocation> = response.take(0)?;
-    println!("Inserted {} records", inserted.len());
-    Ok(true)
-}
-
-pub async fn store_rspko_points() -> Result<bool> {
-    println!("Synchronising RSPKO points");
-
-    let file = File::open("rspko.json").expect("Failed to open rspko.json");
-    let reader = BufReader::new(file);
-    let features: Vec<CreateBinLocation> = serde_json::from_reader(reader).unwrap();
-
-    let mut success_count = 0;
-    let mut total_count = 0;
-
-    let result = features
-        .into_iter()
-        .map(|feature| {
-            return serde_json::json!({
-                "latitude": feature.latitude,
-                "longitude": feature.longitude,
-                "address": feature.address,
-                "preset": "setka"
-            });
-        })
-        .collect::<Vec<serde_json::Value>>();
-
-    let sql = "INSERT INTO bin_location $data;";
-    let mut response = DB.query(sql).bind(("data", result)).await?;
+    let mut response = DB.query(sql).bind(("data", data)).await?;
 
     let inserted: Vec<BinLocation> = response.take(0)?;
     println!("Inserted {} records", inserted.len());

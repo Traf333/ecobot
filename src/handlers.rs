@@ -92,33 +92,14 @@ pub async fn message_handler(
         let bin_locations = db::get_bin_locations(latitude, longitude).await?;
 
         let mut content = "".to_string();
+
         if bin_locations.is_empty() {
-            content =
-                "*3\\- и 4\\-секционные контейнеры РСО в радиусе 1 км не найдены.*".to_string();
-            content.push_str("\n👉 Проверить самостоятельно [на сайте обслуживающей компании ЕСОО](https://new.esoo39.ru/%d1%80%d1%81%d0%be/)");
-
-            content.push_str("\n\n*Сетки для сбора пластика в радиусе 1 км не найдены*\n");
-            content.push_str("👉 Проверить по адресу [на сайте обслуживающей компании РСПО КО](https://rspoko.ru/cbor-othodov-plastika-ot-naseleniya)");
-
-            bot.send_message(msg.chat.id, content)
-                .disable_web_page_preview(true)
-                .parse_mode(ParseMode::MarkdownV2)
-                .await?;
-            return Ok(());
-        }
-
-        // Filter bins into RSPKO (setka) and ESSO (others) categories
-        let (rspko_bins, esso_bins): (Vec<_>, Vec<_>) = bin_locations
-            .into_iter()
-            .partition(|(_, bin_loc)| bin_loc.preset == "setka");
-
-        if esso_bins.is_empty() {
             content =
                 "*3\\- и 4\\-секционные контейнеры РСО в радиусе 1 км не найдены.*".to_string();
             content.push_str("\n👉 Проверить самостоятельно [на сайте обслуживающей компании ЕСОО](https://new.esoo39.ru/%d1%80%d1%81%d0%be/)");
         } else {
             content = "*Ближайшие 3\\- и 4\\-секционные контейнеры РСО:*".to_string();
-            for (distance, bin_location) in esso_bins.into_iter().take(2) {
+            for (distance, bin_location) in bin_locations.into_iter().take(2) {
                 let distance = distance;
                 let bin_location = bin_location;
 
@@ -135,30 +116,6 @@ pub async fn message_handler(
                 content.push_str(&bin_text);
             }
             content.push_str("\n👉 Проверить самостоятельно [на сайте обслуживающей компании ЕСОО](https://new.esoo39.ru/%d1%80%d1%81%d0%be/)");
-        }
-
-        if rspko_bins.is_empty() {
-            content.push_str("\n\n*Сетки для сбора пластика в радиусе 1 км не найдены*\n");
-            content.push_str("👉 Проверить по адресу [на сайте обслуживающей компании РСПО КО](https://rspoko.ru/cbor-othodov-plastika-ot-naseleniya)");
-        } else {
-            content.push_str("\n\n*Ближайшие сетки для сбора пластика:*\n");
-            for (distance, bin_location) in rspko_bins.into_iter().take(2) {
-                let distance = distance;
-                let bin_location = bin_location;
-
-                let link_url = format!(
-                    "https://yandex.ru/maps/?rtext={},{}~{},{}",
-                    latitude, longitude, bin_location.latitude, bin_location.longitude
-                );
-                let bin_text = format!(
-                    "\n{}м [{}]({})",
-                    (distance * 1000.0).round(),
-                    bin_location.address,
-                    link_url
-                );
-                content.push_str(&bin_text);
-            }
-            content.push_str("\n👉 Проверить по адресу [на сайте обслуживающей компании РСПО КО](https://rspoko.ru/cbor-othodov-plastika-ot-naseleniya)");
         }
 
         content.push_str(
