@@ -26,18 +26,32 @@ pub fn build_buttons(category: &str, is_external: bool) -> InlineKeyboardMarkup 
     let route = ROUTES.get(category).expect("Route not found");
 
     if let Some(children) = &route.children {
-        let mut chunked: Vec<Vec<InlineKeyboardButton>> = children
-            .chunks(2)
-            .map(|chunk| {
-                chunk
-                    .iter()
-                    .map(|child| {
-                        let route = ROUTES.get(child).expect("Route not found");
-                        InlineKeyboardButton::callback(&route.label, &route.path)
-                    })
-                    .collect()
-            })
-            .collect();
+        let mut chunked: Vec<Vec<InlineKeyboardButton>> = Vec::new();
+        let mut current_row: Vec<InlineKeyboardButton> = Vec::new();
+
+        for child in children {
+            let child_route = ROUTES.get(child).expect("Route not found");
+            let button = InlineKeyboardButton::callback(&child_route.label, &child_route.path);
+
+            if child_route.label.chars().count() > 15 {
+                // Flush any accumulated small buttons before adding a large button row
+                if !current_row.is_empty() {
+                    chunked.push(std::mem::take(&mut current_row));
+                }
+                chunked.push(vec![button]);
+            } else {
+                current_row.push(button);
+                if current_row.len() == 2 {
+                    chunked.push(std::mem::take(&mut current_row));
+                }
+            }
+        }
+
+        // Push remaining small buttons (if the count was odd)
+        if !current_row.is_empty() {
+            chunked.push(current_row);
+        }
+
         buttons.append(&mut chunked);
     } else {
         if is_external {
