@@ -70,10 +70,6 @@
       "other"
     ]
   },
-  "find": {
-    "path": "/find",
-    "label": "📍 Найти контейнер РСО"
-  },
   "plastic": {
     "path": "/plastic",
     "label": "Пластик"
@@ -98,15 +94,8 @@
     "path": "/dangerous",
     "label": "Опасные отходы"
   },
-  "other": {
-    "path": "/other",
-    "label": "Другое"
-  },
-  "kolyovska": {
-    "path": "/kolyovska",
-    "label": "Кольовска",
-    "external": [
-      "Регистрация", "https://forms.gle/uebDwfNxBYf9TLrX7"
-    ]
+  "find": {
+    "path": "/find",
+    "label": "📍 Найти контейнер РСО"
   }
 }
