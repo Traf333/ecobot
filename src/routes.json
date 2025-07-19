@@ -60,6 +60,7 @@
     "path": "/recycling",
     "label": "♻️ Переработка",
     "children": [
+      "find",
       "plastic",
       "paper",
       "metal",
@@ -68,6 +69,10 @@
       "dangerous",
       "other"
     ]
+  },
+  "find": {
+    "path": "/find",
+    "label": "📍 Найти контейнер РСО"
   },
   "plastic": {
     "path": "/plastic",
