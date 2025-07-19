@@ -60,14 +60,19 @@
     "path": "/recycling",
     "label": "♻️ Переработка",
     "children": [
+      "find",
       "plastic",
       "paper",
       "metal",
       "glass",
       "organic",
       "dangerous",
-      "find"
+      "other"
     ]
+  },
+  "find": {
+    "path": "/find",
+    "label": "📍 Найти контейнер РСО"
   },
   "plastic": {
     "path": "/plastic",
@@ -93,8 +98,9 @@
     "path": "/dangerous",
     "label": "Опасные отходы"
   },
-  "find": {
-    "path": "/find",
-    "label": "📍 Найти контейнер РСО"
+  "other": {
+    "path": "/other",
+    "label": "Другое"
+  
   }
 }
