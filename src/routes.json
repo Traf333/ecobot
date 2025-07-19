@@ -60,14 +60,13 @@
     "path": "/recycling",
     "label": "♻️ Переработка",
     "children": [
-      "find",
       "plastic",
       "paper",
       "metal",
       "glass",
       "organic",
       "dangerous",
-      "other"
+      "find"
     ]
   },
   "plastic": {
