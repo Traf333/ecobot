@@ -49,6 +49,8 @@ enum Command {
     Glass,
     /// Organic
     Organic,
+    /// Find
+    Find,
     /// Other
     Other,
     /// GiveAway
@@ -222,6 +224,7 @@ pub async fn message_handler(
                 | Command::Metal
                 | Command::Glass
                 | Command::Organic
+                | Command::Find
                 | Command::Other,
             ) => {
                 let (buttons, content) = build_details(text, false)?;
