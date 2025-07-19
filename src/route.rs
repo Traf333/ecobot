@@ -33,7 +33,7 @@ pub fn build_buttons(category: &str, is_external: bool) -> InlineKeyboardMarkup 
             let child_route = ROUTES.get(child).expect("Route not found");
             let button = InlineKeyboardButton::callback(&child_route.label, &child_route.path);
 
-            if child_route.label.chars().count() > 15 {
+            if child_route.label.chars().count() > 20 {
                 // Flush any accumulated small buttons before adding a large button row
                 if !current_row.is_empty() {
                     chunked.push(std::mem::take(&mut current_row));
