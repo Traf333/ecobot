@@ -108,15 +108,38 @@ pub async fn message_handler(
                     "https://yandex.ru/maps/?rtext={},{}~{},{}",
                     latitude, longitude, bin_location.latitude, bin_location.longitude
                 );
+                let glass_text = if bin_location.preset == "islands#darkgreenIcon" {
+                    " \\(со стеклом\\)"
+                } else {
+                    " \\(без стекла\\)"
+                };
                 let bin_text = format!(
-                    "\n{} м [{}]({})",
+                    "\n{} м [{}]({}){}",
                     (distance * 1000.0).round(),
                     bin_location.address,
-                    link_url
+                    link_url,
+                    glass_text
                 );
                 content.push_str(&bin_text);
             }
             content.push_str("\n👉 Проверить самостоятельно [на сайте обслуживающей компании ЕСОО](https://new.esoo39.ru/%d1%80%d1%81%d0%be/)");
+        }
+
+        let main_point = db::main_point();
+        let distance_to_main = (main_point.distance(latitude, longitude) * 1000.0).round();
+        if distance_to_main < 1000.0 {
+            let link_url = format!(
+                "https://yandex.ru/maps/?rtext={},{}~{},{}",
+                latitude, longitude, main_point.latitude, main_point.longitude
+            );
+
+            content.push_str(
+                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на [ул. 5-я Причальная 2а](https://yandex.ru/maps/?rtext={},{}~{},{}) в радиусе {} м.", latitude, longitude, main_point.latitude, main_point.longitude, distance_to_main)
+            );
+        } else {
+            content.push_str(
+                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на [ул. 5-я Причальная 2а](https://yandex.ru/maps/?text={},{}).", main_point.latitude, main_point.longitude)
+            );
         }
 
         content.push_str(

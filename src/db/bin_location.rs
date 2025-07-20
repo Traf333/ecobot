@@ -23,6 +23,14 @@ struct CreateBinLocation {
     address: String,
 }
 
+impl BinLocation {
+    pub fn distance(&self, latitude: f64, longitude: f64) -> f64 {
+        let point_a = Point::new(latitude, longitude);
+        let point_b = Point::new(self.latitude, self.longitude);
+        distance(point_a, point_b, Unit::Kilometers)
+    }
+}
+
 pub async fn get_bin_locations(latitude: f64, longitude: f64) -> Result<Vec<(f64, BinLocation)>> {
     let sql = r#"
     SELECT * FROM bin_location
@@ -37,11 +45,9 @@ pub async fn get_bin_locations(latitude: f64, longitude: f64) -> Result<Vec<(f64
         .await?;
     let bins: Vec<BinLocation> = response.take(0)?;
     let radius = 1.0;
-    let point_a = Point::new(latitude, longitude);
     let mut filtered_bin_locations = Vec::new();
     for bin_location in bins {
-        let point_b = Point::new(bin_location.latitude, bin_location.longitude);
-        let distance = distance(point_a, point_b, Unit::Kilometers);
+        let distance = bin_location.distance(latitude, longitude);
 
         if distance <= radius {
             filtered_bin_locations.push((distance, bin_location));
@@ -101,13 +107,6 @@ pub async fn store_esso_points() -> Result<bool> {
     // remove all bin locations
     DB.query("DELETE FROM bin_location").await?;
 
-    let initial_point = serde_json::json!({
-        "latitude": 54.697953,
-        "longitude": 20.470404,
-        "address": "Причальная 5‑я улица, 2а",
-        "preset": "all"
-    });
-
     let result = features
         .into_iter()
         .map(|feature| {
@@ -120,12 +119,20 @@ pub async fn store_esso_points() -> Result<bool> {
         })
         .collect::<Vec<serde_json::Value>>();
 
-    let mut data = vec![initial_point];
-    data.extend(result);
     let sql = "INSERT INTO bin_location $data;";
-    let mut response = DB.query(sql).bind(("data", data)).await?;
+    let mut response = DB.query(sql).bind(("data", result)).await?;
 
     let inserted: Vec<BinLocation> = response.take(0)?;
     println!("Inserted {} records", inserted.len());
     Ok(true)
+}
+
+pub fn main_point() -> BinLocation {
+    BinLocation {
+        id: ("bin_location", "main").into(),
+        latitude: 54.697953,
+        longitude: 20.470404,
+        address: "Причальная 5-я улица, 2а".to_string(),
+        preset: "all".to_string(),
+    }
 }
