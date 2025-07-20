@@ -109,9 +109,9 @@ pub async fn message_handler(
                     latitude, longitude, bin_location.latitude, bin_location.longitude
                 );
                 let glass_text = if bin_location.preset == "islands#darkgreenIcon" {
-                    " \\(со стеклом\\)"
+                    " со стеклом"
                 } else {
-                    " \\(без стекла\\)"
+                    " без стекла"
                 };
                 let bin_text = format!(
                     "\n{} м [{}]({}){}",
