@@ -109,12 +109,12 @@ pub async fn message_handler(
                     latitude, longitude, bin_location.latitude, bin_location.longitude
                 );
                 let glass_text = if bin_location.preset == "islands#darkgreenIcon" {
-                    " со стеклом"
+                    "со стеклом"
                 } else {
-                    " без стекла"
+                    "без стекла"
                 };
                 let bin_text = format!(
-                    "\n{} м [{}]({}){}",
+                    "\n{} м [{}]({}) {}",
                     (distance * 1000.0).round(),
                     bin_location.address,
                     link_url,
@@ -129,11 +129,11 @@ pub async fn message_handler(
         let distance_to_main = (main_point.distance(latitude, longitude) * 1000.0).round();
         if distance_to_main < 1000.0 {
             content.push_str(
-                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на [ул. 5-я Причальная 2а](https://yandex.ru/maps/?rtext={},{}~{},{}&rtt=pedestrian) в радиусе {} м.", latitude, longitude, main_point.latitude, main_point.longitude, distance_to_main)
+                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на  в радиусе {} м.", distance_to_main)
             );
         } else {
             content.push_str(
-                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на [ул. 5-я Причальная 2а](https://yandex.ru/maps/?text={},{}).", main_point.latitude, main_point.longitude)
+                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на .")
             );
         }
 
