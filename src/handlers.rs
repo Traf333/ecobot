@@ -105,7 +105,7 @@ pub async fn message_handler(
                 let bin_location = bin_location;
 
                 let link_url = format!(
-                    "https://yandex.ru/maps/?rtext={},{}~{},{}",
+                    "https://yandex.ru/maps/?rtext={},{}~{},{}&rtt=pedestrian",
                     latitude, longitude, bin_location.latitude, bin_location.longitude
                 );
                 let glass_text = if bin_location.preset == "islands#darkgreenIcon" {
@@ -128,13 +128,8 @@ pub async fn message_handler(
         let main_point = db::main_point();
         let distance_to_main = (main_point.distance(latitude, longitude) * 1000.0).round();
         if distance_to_main < 1000.0 {
-            let link_url = format!(
-                "https://yandex.ru/maps/?rtext={},{}~{},{}",
-                latitude, longitude, main_point.latitude, main_point.longitude
-            );
-
             content.push_str(
-                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на [ул. 5-я Причальная 2а](https://yandex.ru/maps/?rtext={},{}~{},{}) в радиусе {} м.", latitude, longitude, main_point.latitude, main_point.longitude, distance_to_main)
+                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на [ул. 5-я Причальная 2а](https://yandex.ru/maps/?rtext={},{}~{},{}&rtt=pedestrian) в радиусе {} м.", latitude, longitude, main_point.latitude, main_point.longitude, distance_to_main)
             );
         } else {
             content.push_str(
