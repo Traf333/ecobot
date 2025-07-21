@@ -130,8 +130,8 @@ pub async fn store_esso_points() -> Result<bool> {
 pub fn main_point() -> BinLocation {
     BinLocation {
         id: ("bin_location", "main").into(),
-        latitude: 54.697953,
-        longitude: 20.470404,
+        latitude: 54.697340,
+        longitude: 20.470642,
         address: "Причальная 5-я улица, 2а".to_string(),
         preset: "all".to_string(),
     }
