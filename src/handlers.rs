@@ -64,7 +64,11 @@ enum Command {
 }
 
 fn escape_markdown_v2(text: String) -> String {
-    teloxide::utils::markdown::escape(&text).to_owned()
+    text.replace('.', "\\.")
+        .replace('-', "\\-")
+        .replace('{', "\\{")
+        .replace('}', "\\}")
+        .replace('!', "\\!")
 }
 
 pub async fn message_handler(
