@@ -129,17 +129,18 @@ pub async fn message_handler(
         let distance_to_main = (main_point.distance(latitude, longitude) * 1000.0).round();
         if distance_to_main < 1000.0 {
             content.push_str(
-                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на  в радиусе {} м.", distance_to_main)
+                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на [ул. 5-я Причальная 2а](https://yandex.ru/maps/?rtext={},{}~{},{}&rtt=pedestrian) в радиусе {} м.", latitude, longitude, main_point.latitude, main_point.longitude, distance_to_main)
             );
         } else {
             content.push_str(
-                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на .")
+                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на [ул. 5-я Причальная 2а](https://yandex.ru/maps/?text={},{}).", main_point.latitude, main_point.longitude)
             );
         }
 
         content.push_str(
             "\n\nОтправьте новую геопозицию, если хотите найти другие контейнеры.\nОтправьте «Бот», если хотите вернуться в начало.",
         );
+        dbg!(&content);
 
         bot.send_message(msg.chat.id, escape_markdown_v2(content))
             .disable_web_page_preview(true)
@@ -148,7 +149,6 @@ pub async fn message_handler(
 
         return Ok(());
     }
-
     // Handle text messages
     if let Some(text) = msg.text() {
         match BotCommands::parse(text, me.username()) {
