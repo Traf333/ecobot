@@ -64,7 +64,7 @@ enum Command {
 }
 
 fn escape_markdown_v2(text: String) -> String {
-    teloxide::utils::markdown::escape(&text).into_owned()
+    teloxide::utils::markdown::escape(&text).to_owned()
 }
 
 pub async fn message_handler(
