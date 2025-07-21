@@ -64,11 +64,7 @@ enum Command {
 }
 
 fn escape_markdown_v2(text: String) -> String {
-    text.replace('.', "\\.")
-        .replace('-', "\\-")
-        .replace('{', "\\{")
-        .replace('}', "\\}")
-        .replace('!', "\\!")
+    teloxide::utils::markdown::escape(&text).into_owned()
 }
 
 pub async fn message_handler(
@@ -140,7 +136,6 @@ pub async fn message_handler(
         content.push_str(
             "\n\nОтправьте новую геопозицию, если хотите найти другие контейнеры.\nОтправьте «Бот», если хотите вернуться в начало.",
         );
-        dbg!(&content);
 
         bot.send_message(msg.chat.id, escape_markdown_v2(content))
             .disable_web_page_preview(true)
