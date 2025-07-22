@@ -102,5 +102,10 @@
     "path": "/other",
     "label": "Другое"
   
+  },
+  "setkibot_update": {
+    "path": "/setkibot_update",
+    "label": "Сетки бот апдейт"
+  
   }
 }
