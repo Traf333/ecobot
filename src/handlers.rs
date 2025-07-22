@@ -160,11 +160,7 @@ pub async fn message_handler(
                 if msg.chat.id == ChatId(ADMIN_ID) {
                     let parts: Vec<&str> = text.split_whitespace().collect();
                     let second_part = if parts.len() > 1 { parts[1] } else { "" };
-                    let blacklisted_ids: Vec<i64> = vec![
-                        1137539828, 245300509, 480442732, 108609383, 370942991, 912211086,
-                        1030476206, 439366454, 828969293, 262894147, 473789332, 393940845,
-                        5065333159, 1067873349, 683464776, 835102541, 6471579202, 6467162272,
-                    ];
+                    let blacklisted_ids: Vec<i64> = vec![];
                     let (buttons, content) = build_details(second_part, true)?;
                     // get all users and send
                     let users = users::get_all_users().await?;
