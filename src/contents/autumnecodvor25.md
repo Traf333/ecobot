@@ -15,6 +15,6 @@
 ➖ Ботаническая прогулка по аптекарскому огороду
 ➖ Лавочка с экотоварами
 
-*[Какое вторсырьё будем принимать]([https://docs.google.com/spreadsheets/d/1hoWz-KaPFtnpAr9FMIE_2llk2Fynw2a0zHR2dVa7uQk/edit?usp=sharing](https://docs.google.com/spreadsheets/d/1R5XJjcubmUPT25pCpfUqYZ6BIWU3nTgXxLB6sdzOkZQ/edit?usp=sharing))*
+*[Какое вторсырьё будем принимать](https://docs.google.com/spreadsheets/d/1R5XJjcubmUPT25pCpfUqYZ6BIWU3nTgXxLB6sdzOkZQ/edit?usp=sharing)*
 
 👉 Подробности в [ВК](https://vk.com/ecodvor39) и [Телеграм](https://t.me/ecodvor39) Экодвора.
