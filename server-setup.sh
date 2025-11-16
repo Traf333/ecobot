@@ -42,8 +42,8 @@ USERNAME=$DB_USERNAME
 PASSWORD=$DB_PASSWORD
 EOF
 
-# Set permissions
-sudo chmod 600 /opt/ecobot/.env
+# Set permissions (readable by root, needed for Docker)
+sudo chmod 644 /opt/ecobot/.env
 
 echo "✅ .env file created at /opt/ecobot/.env"
 echo ""
