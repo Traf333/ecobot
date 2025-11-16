@@ -1,0 +1,12 @@
+target/
+.git/
+.gitignore
+.env
+.env.*
+!.env.example
+*.md
+.DS_Store
+chat_id.csv
+Dockerfile
+.github/
+server-setup.sh
