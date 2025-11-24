@@ -2,17 +2,12 @@
   "start": {
     "path": "/",
     "label": "Главная",
-    "children": ["recycling", "give_away", "faq"]
+    "children": ["recycling", "give_away", "faq", "subscriptions"]
   },
   "faq": {
     "path": "/faq",
     "label": "❓ Что делать, если",
-    "children": [
-      "green_city",
-      "garbage",
-      "animal",
-      "nature"
-    ]
+    "children": ["green_city", "garbage", "animal", "nature"]
   },
   "green_city": {
     "path": "/green_city",
@@ -33,12 +28,7 @@
   "give_away": {
     "path": "/give_away",
     "label": "👐 Ненужные вещи",
-    "children": [
-      "clothes",
-      "food",
-      "books",
-      "art"
-    ]
+    "children": ["clothes", "food", "books", "art"]
   },
   "clothes": {
     "path": "/clothes",
@@ -101,11 +91,38 @@
   "other": {
     "path": "/other",
     "label": "Другое"
-  
   },
   "autumnecodvor25": {
     "path": "/autumnecodvor25",
     "label": "Осенний Экодвор"
-  
+  },
+  "subscriptions": {
+    "path": "/subscriptions",
+    "label": "🔔 Подписки",
+    "children": ["subscriptions_main", "subscriptions_advent"]
+  },
+  "subscriptions_main": {
+    "path": "/subscriptions/main",
+    "label": "Основные уведомления"
+  },
+  "subscriptions_advent": {
+    "path": "/subscriptions/advent",
+    "label": "Адвент-календарь"
+  },
+  "subscribe_main": {
+    "path": "/subscribe/main",
+    "label": "Подписаться"
+  },
+  "unsubscribe_main": {
+    "path": "/unsubscribe/main",
+    "label": "Отписаться"
+  },
+  "subscribe_advent": {
+    "path": "/subscribe/advent",
+    "label": "Подписаться"
+  },
+  "unsubscribe_advent": {
+    "path": "/unsubscribe/advent",
+    "label": "Отписаться"
   }
 }
