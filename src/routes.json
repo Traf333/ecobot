@@ -102,27 +102,27 @@
     "children": ["subscriptions_main", "subscriptions_advent"]
   },
   "subscriptions_main": {
-    "path": "/subscriptions/main",
+    "path": "/subscriptions_main",
     "label": "Основные уведомления"
   },
   "subscriptions_advent": {
-    "path": "/subscriptions/advent",
+    "path": "/subscriptions_advent",
     "label": "Адвент-календарь"
   },
   "subscribe_main": {
-    "path": "/subscribe/main",
+    "path": "/subscribe_main",
     "label": "Подписаться"
   },
   "unsubscribe_main": {
-    "path": "/unsubscribe/main",
+    "path": "/unsubscribe_main",
     "label": "Отписаться"
   },
   "subscribe_advent": {
-    "path": "/subscribe/advent",
+    "path": "/subscribe_advent",
     "label": "Подписаться"
   },
   "unsubscribe_advent": {
-    "path": "/unsubscribe/advent",
+    "path": "/unsubscribe_advent",
     "label": "Отписаться"
   }
 }

@@ -35,8 +35,8 @@ pub fn build_buttons_with_user(
     let route = ROUTES.get(category).expect("Route not found");
 
     // Handle subscription pages with dynamic subscribe/unsubscribe buttons
-    if category.starts_with("subscriptions/") {
-        let subscription_type = category.strip_prefix("subscriptions/").unwrap();
+    if category.starts_with("subscriptions_") {
+        let subscription_type = category.strip_prefix("subscriptions_").unwrap();
 
         if let Some(uid) = user_id {
             // Check subscription status
@@ -50,14 +50,14 @@ pub fn build_buttons_with_user(
 
             if is_subscribed {
                 // Show unsubscribe button
-                let unsubscribe_path = format!("/unsubscribe/{}", subscription_type);
+                let unsubscribe_path = format!("/unsubscribe_{}", subscription_type);
                 buttons.push(vec![InlineKeyboardButton::callback(
                     "❌ Отписаться",
                     &unsubscribe_path,
                 )]);
             } else {
                 // Show subscribe button
-                let subscribe_path = format!("/subscribe/{}", subscription_type);
+                let subscribe_path = format!("/subscribe_{}", subscription_type);
                 buttons.push(vec![InlineKeyboardButton::callback(
                     "✅ Подписаться",
                     &subscribe_path,

@@ -290,8 +290,8 @@ pub async fn callback_handler(
         bot.answer_callback_query(&q.id).await?;
 
         // Handle subscribe/unsubscribe actions
-        if text.starts_with("/subscribe/") {
-            let subscription_type = text.strip_prefix("/subscribe/").unwrap();
+        if text.starts_with("/subscribe_") {
+            let subscription_type = text.strip_prefix("/subscribe_").unwrap();
             match db::subscribe_user(user_id.try_into().unwrap(), subscription_type).await {
                 Ok(true) => {
                     let (buttons, content) = build_details(text, false)?;
@@ -312,8 +312,8 @@ pub async fn callback_handler(
                 }
             }
             return Ok(());
-        } else if text.starts_with("/unsubscribe/") {
-            let subscription_type = text.strip_prefix("/unsubscribe/").unwrap();
+        } else if text.starts_with("/unsubscribe_") {
+            let subscription_type = text.strip_prefix("/unsubscribe_").unwrap();
             match db::unsubscribe_user(user_id.try_into().unwrap(), subscription_type).await {
                 Ok(true) => {
                     let (buttons, content) = build_details(text, false)?;
@@ -369,7 +369,7 @@ fn build_details_with_user(
     is_external: bool,
     user_id: Option<i64>,
 ) -> Result<(InlineKeyboardMarkup, String), Box<dyn Error + Send + Sync>> {
-    let route = text.replace("/", "");
+    let route = text.trim_start_matches('/').replace("/", "-");
     let file_name = format!("{}.md", &route);
     let content = Contents::get(&file_name)
         .ok_or_else(|| format!("File {} not found", file_name))?

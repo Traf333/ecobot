@@ -9,7 +9,10 @@ pub struct User {
     pub id: Thing,
     pub user_id: i64,
     pub created_at: DateTime<Utc>,
+    #[serde(default)]
     pub subscriptions: Vec<String>,
+    #[serde(default = "Utc::now")]
+    pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -17,6 +20,7 @@ struct CreateUser {
     user_id: i64,
     created_at: DateTime<Utc>,
     subscriptions: Vec<String>,
+    updated_at: DateTime<Utc>,
 }
 
 /// Store a user ID in the database
@@ -27,10 +31,12 @@ pub async fn store_user(user_id: i64) -> Result<bool> {
     }
 
     // Create a new user
+    let now = Utc::now();
     let user = CreateUser {
         user_id,
-        created_at: Utc::now(),
+        created_at: now,
         subscriptions: vec![],
+        updated_at: now,
     };
 
     let created: Option<User> = DB
@@ -102,13 +108,32 @@ pub async fn subscribe_user(user_id: i64, subscription: &str) -> Result<bool> {
         .find(|u| u.user_id == user_id)
         .ok_or_else(|| anyhow!("User not found"))?;
 
-    let _: Option<User> = DB
-        .update(("user", user.id.id.to_string()))
-        .merge(serde_json::json!({ "subscriptions": subscriptions }))
+    let record_id = format!("{}:{}", user.id.tb, user.id.id);
+    let id_string = user.id.id.to_string();
+    log::info!(
+        "Subscribing telegram user {} (DB record: {}) to {} with subscriptions: {:?}",
+        user_id,
+        record_id,
+        subscription,
+        subscriptions
+    );
+
+    let updated: Option<User> = DB
+        .update(("user", id_string))
+        .merge(serde_json::json!({
+            "subscriptions": subscriptions,
+            "updated_at": Utc::now()
+        }))
         .await
         .map_err(|e| anyhow!("Failed to update user: {}", e))?;
 
-    log::info!("User {} subscribed to {}", user_id, subscription);
+    log::info!(
+        "Telegram user {} (DB record: {}) subscribed to {} - Update success: {}",
+        user_id,
+        record_id,
+        subscription,
+        updated.is_some()
+    );
     Ok(true)
 }
 
@@ -134,12 +159,31 @@ pub async fn unsubscribe_user(user_id: i64, subscription: &str) -> Result<bool> 
         .find(|u| u.user_id == user_id)
         .ok_or_else(|| anyhow!("User not found"))?;
 
-    let _: Option<User> = DB
-        .update(("user", user.id.id.to_string()))
-        .merge(serde_json::json!({ "subscriptions": subscriptions }))
+    let record_id = format!("{}:{}", user.id.tb, user.id.id);
+    let id_string = user.id.id.to_string();
+    log::info!(
+        "Unsubscribing telegram user {} (DB record: {}) from {} with subscriptions: {:?}",
+        user_id,
+        record_id,
+        subscription,
+        subscriptions
+    );
+
+    let updated: Option<User> = DB
+        .update(("user", id_string))
+        .merge(serde_json::json!({
+            "subscriptions": subscriptions,
+            "updated_at": Utc::now()
+        }))
         .await
         .map_err(|e| anyhow!("Failed to update user: {}", e))?;
 
-    log::info!("User {} unsubscribed from {}", user_id, subscription);
+    log::info!(
+        "Telegram user {} (DB record: {}) unsubscribed from {} - Update success: {}",
+        user_id,
+        record_id,
+        subscription,
+        updated.is_some()
+    );
     Ok(true)
 }
