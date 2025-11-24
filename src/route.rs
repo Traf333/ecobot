@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use crate::db;
 use once_cell::sync::Lazy;
 use reqwest::Url;
 use teloxide::types::{InlineKeyboardButton, InlineKeyboardMarkup};
@@ -21,9 +22,56 @@ pub fn routes() -> Result<HashMap<String, Route>, serde_json::Error> {
 }
 
 pub fn build_buttons(category: &str, is_external: bool) -> InlineKeyboardMarkup {
+    build_buttons_with_user(category, is_external, None)
+}
+
+pub fn build_buttons_with_user(
+    category: &str,
+    is_external: bool,
+    user_id: Option<i64>,
+) -> InlineKeyboardMarkup {
     let mut buttons: Vec<Vec<InlineKeyboardButton>> = vec![];
 
     let route = ROUTES.get(category).expect("Route not found");
+
+    // Handle subscription pages with dynamic subscribe/unsubscribe buttons
+    if category.starts_with("subscriptions/") {
+        let subscription_type = category.strip_prefix("subscriptions/").unwrap();
+
+        if let Some(uid) = user_id {
+            // Check subscription status
+            let is_subscribed = tokio::task::block_in_place(|| {
+                tokio::runtime::Handle::current().block_on(async {
+                    db::is_subscribed(uid, subscription_type)
+                        .await
+                        .unwrap_or(false)
+                })
+            });
+
+            if is_subscribed {
+                // Show unsubscribe button
+                let unsubscribe_path = format!("/unsubscribe/{}", subscription_type);
+                buttons.push(vec![InlineKeyboardButton::callback(
+                    "❌ Отписаться",
+                    &unsubscribe_path,
+                )]);
+            } else {
+                // Show subscribe button
+                let subscribe_path = format!("/subscribe/{}", subscription_type);
+                buttons.push(vec![InlineKeyboardButton::callback(
+                    "✅ Подписаться",
+                    &subscribe_path,
+                )]);
+            }
+        }
+
+        buttons.push(vec![InlineKeyboardButton::callback(
+            "⬅️ Назад к подпискам",
+            "/subscriptions",
+        )]);
+
+        return InlineKeyboardMarkup::new(buttons);
+    }
 
     if let Some(children) = &route.children {
         let mut chunked: Vec<Vec<InlineKeyboardButton>> = Vec::new();

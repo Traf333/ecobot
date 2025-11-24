@@ -16,7 +16,7 @@ use teloxide::{
 };
 
 use crate::db;
-use crate::route::build_buttons;
+use crate::route::{build_buttons, build_buttons_with_user};
 use crate::users;
 
 use rust_embed::RustEmbed;
@@ -289,7 +289,55 @@ pub async fn callback_handler(
         // parameters to tweak what happens on the client side.
         bot.answer_callback_query(&q.id).await?;
 
-        let (buttons, content) = build_details(text, false)?;
+        // Handle subscribe/unsubscribe actions
+        if text.starts_with("/subscribe/") {
+            let subscription_type = text.strip_prefix("/subscribe/").unwrap();
+            match db::subscribe_user(user_id.try_into().unwrap(), subscription_type).await {
+                Ok(true) => {
+                    let (buttons, content) = build_details(text, false)?;
+                    bot.send_message(q.from.id, content)
+                        .disable_web_page_preview(true)
+                        .parse_mode(ParseMode::MarkdownV2)
+                        .reply_markup(buttons)
+                        .await?;
+                }
+                Ok(false) => {
+                    bot.send_message(q.from.id, "Вы уже подписаны на эту рассылку.")
+                        .await?;
+                }
+                Err(e) => {
+                    error!("Error subscribing user: {:?}", e);
+                    bot.send_message(q.from.id, "Произошла ошибка при подписке.")
+                        .await?;
+                }
+            }
+            return Ok(());
+        } else if text.starts_with("/unsubscribe/") {
+            let subscription_type = text.strip_prefix("/unsubscribe/").unwrap();
+            match db::unsubscribe_user(user_id.try_into().unwrap(), subscription_type).await {
+                Ok(true) => {
+                    let (buttons, content) = build_details(text, false)?;
+                    bot.send_message(q.from.id, content)
+                        .disable_web_page_preview(true)
+                        .parse_mode(ParseMode::MarkdownV2)
+                        .reply_markup(buttons)
+                        .await?;
+                }
+                Ok(false) => {
+                    bot.send_message(q.from.id, "Вы не подписаны на эту рассылку.")
+                        .await?;
+                }
+                Err(e) => {
+                    error!("Error unsubscribing user: {:?}", e);
+                    bot.send_message(q.from.id, "Произошла ошибка при отписке.")
+                        .await?;
+                }
+            }
+            return Ok(());
+        }
+
+        let (buttons, content) =
+            build_details_with_user(text, false, Some(user_id.try_into().unwrap()))?;
 
         match bot
             .send_message(q.from.id, content)
@@ -313,6 +361,14 @@ fn build_details(
     text: &str,
     is_external: bool,
 ) -> Result<(InlineKeyboardMarkup, String), Box<dyn Error + Send + Sync>> {
+    build_details_with_user(text, is_external, None)
+}
+
+fn build_details_with_user(
+    text: &str,
+    is_external: bool,
+    user_id: Option<i64>,
+) -> Result<(InlineKeyboardMarkup, String), Box<dyn Error + Send + Sync>> {
     let route = text.replace("/", "");
     let file_name = format!("{}.md", &route);
     let content = Contents::get(&file_name)
@@ -320,7 +376,7 @@ fn build_details(
         .data;
 
     let content = String::from_utf8(content.to_vec())?;
-    let buttons = build_buttons(&route, is_external);
+    let buttons = build_buttons_with_user(&route, is_external, user_id);
 
     Ok((buttons, escape_markdown_v2(content)))
 }
