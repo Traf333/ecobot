@@ -61,6 +61,8 @@ enum Command {
     Broadcast,
     /// Send a test message to a specific user
     TestMessage,
+    /// Advent calendar
+    Advent,
 }
 
 fn escape_markdown_v2(text: String) -> String {
@@ -224,6 +226,27 @@ pub async fn message_handler(
                         ),
                     )
                     .await?;
+                }
+            }
+            Ok(Command::Advent) => {
+                if let Some(user_id) = msg.from() {
+                    let user_id = user_id.id.0;
+                    let (buttons, content) =
+                        build_details_with_user(text, false, Some(user_id.try_into().unwrap()))?;
+
+                    match bot
+                        .send_message(msg.chat.id, content)
+                        .disable_web_page_preview(true)
+                        .parse_mode(ParseMode::MarkdownV2)
+                        .reply_markup(buttons)
+                        .await
+                    {
+                        Ok(_) => (),
+                        Err(e) => {
+                            error!("Error sending message: {:?}", e);
+                            bot.send_message(msg.chat.id, e.to_string()).await?;
+                        }
+                    }
                 }
             }
             Ok(
