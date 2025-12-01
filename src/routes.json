@@ -109,6 +109,10 @@
     "path": "/subscriptions_advent",
     "label": "Адвент-календарь"
   },
+  "advent": {
+    "path": "/advent",
+    "label": "Адвент-календарь"
+  },
   "subscribe_main": {
     "path": "/subscribe_main",
     "label": "Подписаться"
