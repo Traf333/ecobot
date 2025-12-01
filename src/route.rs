@@ -65,10 +65,10 @@ pub fn build_buttons_with_user(
             }
         }
 
-        buttons.push(vec![InlineKeyboardButton::callback(
-            "⬅️ Назад к подпискам",
-            "/subscriptions",
-        )]);
+        // buttons.push(vec![InlineKeyboardButton::callback(
+        //     "⬅️ Назад к подпискам",
+        //     "/subscriptions",
+        // )]);
 
         return InlineKeyboardMarkup::new(buttons);
     }
