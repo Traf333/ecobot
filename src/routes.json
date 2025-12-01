@@ -2,7 +2,7 @@
   "start": {
     "path": "/",
     "label": "Главная",
-    "children": ["recycling", "give_away", "faq", "subscriptions"]
+    "children": ["recycling", "give_away", "faq"]
   },
   "faq": {
     "path": "/faq",
