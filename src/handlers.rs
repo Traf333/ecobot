@@ -163,13 +163,17 @@ pub async fn message_handler(
                     let parts: Vec<&str> = text.split_whitespace().collect();
                     let second_part = if parts.len() > 1 { parts[1] } else { "" };
                     let blacklisted_ids: Vec<i64> = vec![];
-                    let (buttons, content) = build_details(second_part, true)?;
+
                     // get all users and send
                     let users = users::get_all_users().await?;
                     for user_id in users {
                         if blacklisted_ids.contains(&user_id) {
                             continue;
                         }
+
+                        // Build personalized buttons for each user
+                        let (buttons, content) =
+                            build_details_with_user(second_part, true, Some(user_id))?;
 
                         match bot
                             .send_message(ChatId(user_id), &content)
@@ -210,7 +214,9 @@ pub async fn message_handler(
                     let parts: Vec<&str> = text.split_whitespace().collect();
                     let second_part = if parts.len() > 1 { parts[1] } else { "" };
 
-                    let (buttons, content) = build_details(second_part, true)?;
+                    // Build buttons with the test user's ID for personalized subscription buttons
+                    let (buttons, content) =
+                        build_details_with_user(second_part, true, Some(test_chat_id))?;
 
                     bot.send_message(ChatId(test_chat_id), content)
                         .disable_web_page_preview(true)
