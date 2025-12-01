@@ -11,10 +11,19 @@ RUN apt-get update && \
 # Copy manifests
 COPY Cargo.toml Cargo.lock ./
 
-# Copy source code
+# Create a dummy main.rs to build dependencies
+RUN mkdir src && \
+    echo "fn main() {}" > src/main.rs
+
+# Build dependencies only - this layer will be cached unless Cargo.toml/Cargo.lock changes
+RUN cargo build --release && \
+    rm -rf src
+
+# Now copy the actual source code
 COPY src ./src
 
 # Build the application in release mode
+# This will only rebuild your code, not dependencies
 RUN cargo build --release
 
 # Runtime stage
