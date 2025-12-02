@@ -313,13 +313,32 @@ pub async fn message_handler(
             Ok(Command::Stop) => {
                 if let Some(user) = msg.from() {
                     let user_id = user.id.0;
+
                     match db::unsubscribe_all(user_id.try_into().unwrap()).await {
                         Ok(true) => {
-                            bot.send_message(
-                                msg.chat.id,
-                                "Вы успешно отписались от всех рассылок.",
-                            )
-                            .await?;
+                            let content = match Contents::get("unsubscribe_advent.md") {
+                                Some(file) => match String::from_utf8(file.data.to_vec()) {
+                                    Ok(content) => escape_markdown_v2(content),
+                                    Err(e) => {
+                                        error!("Failed to parse unsubscribe_advent.md: {:?}", e);
+                                        bot.send_message(
+                                            msg.chat.id,
+                                            "Ошибка при загрузке файла unsubscribe_advent.md",
+                                        )
+                                        .await?;
+                                        return Ok(());
+                                    }
+                                },
+                                None => {
+                                    error!("unsubscribe_advent.md not found");
+                                    bot.send_message(
+                                        msg.chat.id,
+                                        "Файл unsubscribe_advent.md не найден",
+                                    )
+                                    .await?;
+                                    return Ok(());
+                                }
+                            };
                         }
                         Ok(false) => {
                             bot.send_message(msg.chat.id, "Вы не подписаны ни на одну рассылку.")
@@ -379,7 +398,7 @@ pub async fn message_handler(
 
                     let mut success_count = 0;
                     let mut error_count = 0;
-                    let photo_url = "https://uploads.ororo-mirror.tv/uploads/show/poster/2934/thumb_1AbpAb8hjoxd7n6hIBkH0E0QGt6.jpg";
+                    let photo_url = "https://raw.githubusercontent.com/Traf333/ecobot/refs/heads/main/src/images/advent1.jpg";
 
                     for user_id in users {
                         match bot
@@ -459,32 +478,7 @@ pub async fn message_handler(
                             .reply_markup(buttons)
                             .await?;
                     }
-                    "стоп" | "Стоп" => {
-                        if let Some(user) = msg.from() {
-                            let user_id = user.id.0;
-                            match db::unsubscribe_all(user_id.try_into().unwrap()).await {
-                                Ok(true) => {
-                                    bot.send_message(
-                                        msg.chat.id,
-                                        "Вы успешно отписались от всех рассылок.",
-                                    )
-                                    .await?;
-                                }
-                                Ok(false) => {
-                                    bot.send_message(
-                                        msg.chat.id,
-                                        "Вы не подписаны ни на одну рассылку.",
-                                    )
-                                    .await?;
-                                }
-                                Err(e) => {
-                                    error!("Error unsubscribing user from all: {:?}", e);
-                                    bot.send_message(msg.chat.id, "Произошла ошибка при отписке.")
-                                        .await?;
-                                }
-                            }
-                        }
-                    }
+                    "стоп" | "Стоп" => {}
                     _ => {
                         bot.send_message(msg.chat.id, format!("Неизвестная команда: {}. Попробуйте начать сначала написав \"Бот\"", text))
                             .await?;
