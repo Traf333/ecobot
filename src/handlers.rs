@@ -27,6 +27,10 @@ const ADMIN_ID: i64 = 283564928;
 #[folder = "src/contents/"] // Path to your contents directory
 struct Contents;
 
+#[derive(RustEmbed)]
+#[folder = "src/images/"] // Path to your images directory
+struct Images;
+
 /// These commands are supported:
 #[derive(BotCommands)]
 #[command(rename_rule = "lowercase")]
@@ -265,9 +269,23 @@ pub async fn message_handler(
                     };
 
                     info!("Sending test advent.md to user {}", test_chat_id);
-                    let photo_path = "src/images/advent1.jpg";
+
+                    // Get embedded image
+                    let image_data = match Images::get("advent1.jpg") {
+                        Some(file) => file.data,
+                        None => {
+                            error!("advent1.jpg not found");
+                            bot.send_message(msg.chat.id, "Изображение advent1.jpg не найдено")
+                                .await?;
+                            return Ok(());
+                        }
+                    };
+
                     match bot
-                        .send_photo(ChatId(test_chat_id), InputFile::file(photo_path))
+                        .send_photo(
+                            ChatId(test_chat_id),
+                            InputFile::memory(image_data.into_owned()).file_name("advent1.jpg"),
+                        )
                         .caption(&content)
                         .parse_mode(ParseMode::MarkdownV2)
                         .await
@@ -362,6 +380,18 @@ pub async fn message_handler(
                     };
 
                     info!("Sending advent.md to {} users", users.len());
+
+                    // Get embedded image
+                    let image_data = match Images::get("advent1.jpg") {
+                        Some(file) => file.data,
+                        None => {
+                            error!("advent1.jpg not found");
+                            bot.send_message(msg.chat.id, "Изображение advent1.jpg не найдено")
+                                .await?;
+                            return Ok(());
+                        }
+                    };
+
                     bot.send_message(
                         msg.chat.id,
                         format!("Отправка сообщения {} подписчикам...", users.len()),
@@ -370,11 +400,14 @@ pub async fn message_handler(
 
                     let mut success_count = 0;
                     let mut error_count = 0;
-                    let photo_path = "src/images/advent1.jpg";
 
                     for user_id in users {
                         match bot
-                            .send_photo(ChatId(user_id), InputFile::file(photo_path))
+                            .send_photo(
+                                ChatId(user_id),
+                                InputFile::memory(image_data.clone().into_owned())
+                                    .file_name("advent1.jpg"),
+                            )
                             .caption(&content)
                             .parse_mode(ParseMode::MarkdownV2)
                             .await
