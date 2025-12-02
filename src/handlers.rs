@@ -270,7 +270,7 @@ pub async fn message_handler(
 
                     info!("Sending test advent.md to user {}", test_chat_id);
 
-                    let photo_url = "https://uploads.ororo-mirror.tv/uploads/show/poster/2934/thumb_1AbpAb8hjoxd7n6hIBkH0E0QGt6.jpg";
+                    let photo_url = "https://raw.githubusercontent.com/Traf333/ecobot/refs/heads/main/src/images/advent1.jpg";
                     match bot
                         .send_photo(
                             ChatId(test_chat_id),
