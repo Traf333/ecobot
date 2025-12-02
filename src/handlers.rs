@@ -265,12 +265,9 @@ pub async fn message_handler(
                     };
 
                     info!("Sending test advent.md to user {}", test_chat_id);
-                    let photo_url = "https://uploads.ororo-mirror.tv/uploads/show/poster/2934/thumb_1AbpAb8hjoxd7n6hIBkH0E0QGt6.jpg";
+                    let photo_path = "images/advent1.jpg";
                     match bot
-                        .send_photo(
-                            ChatId(test_chat_id),
-                            InputFile::url(Url::parse(photo_url).unwrap()),
-                        )
+                        .send_photo(ChatId(test_chat_id), InputFile::file(photo_path))
                         .caption(&content)
                         .parse_mode(ParseMode::MarkdownV2)
                         .await
@@ -373,14 +370,11 @@ pub async fn message_handler(
 
                     let mut success_count = 0;
                     let mut error_count = 0;
-                    let photo_url = "https://uploads.ororo-mirror.tv/uploads/show/poster/2934/thumb_1AbpAb8hjoxd7n6hIBkH0E0QGt6.jpg";
+                    let photo_path = "images/advent1.jpg";
 
                     for user_id in users {
                         match bot
-                            .send_photo(
-                                ChatId(user_id),
-                                InputFile::url(Url::parse(photo_url).unwrap()),
-                            )
+                            .send_photo(ChatId(user_id), InputFile::file(photo_path))
                             .caption(&content)
                             .parse_mode(ParseMode::MarkdownV2)
                             .await
