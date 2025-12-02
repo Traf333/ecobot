@@ -8,9 +8,9 @@ use log::{error, info};
 use reqwest::Url;
 use teloxide::types::InlineKeyboardButton;
 use teloxide::{
-    payloads::SendMessageSetters,
+    payloads::{SendMessageSetters, SendPhotoSetters},
     prelude::Requester,
-    types::{CallbackQuery, ChatId, InlineKeyboardMarkup, Me, Message, ParseMode},
+    types::{CallbackQuery, ChatId, InlineKeyboardMarkup, InputFile, Me, Message, ParseMode},
     utils::command::BotCommands,
     Bot,
 };
@@ -265,9 +265,13 @@ pub async fn message_handler(
                     };
 
                     info!("Sending test advent.md to user {}", test_chat_id);
+                    let photo_url = "https://uploads.ororo-mirror.tv/uploads/show/poster/2934/thumb_1AbpAb8hjoxd7n6hIBkH0E0QGt6.jpg";
                     match bot
-                        .send_message(ChatId(test_chat_id), &content)
-                        .disable_web_page_preview(true)
+                        .send_photo(
+                            ChatId(test_chat_id),
+                            InputFile::url(Url::parse(photo_url).unwrap()),
+                        )
+                        .caption(&content)
                         .parse_mode(ParseMode::MarkdownV2)
                         .await
                     {
@@ -369,11 +373,15 @@ pub async fn message_handler(
 
                     let mut success_count = 0;
                     let mut error_count = 0;
+                    let photo_url = "https://uploads.ororo-mirror.tv/uploads/show/poster/2934/thumb_1AbpAb8hjoxd7n6hIBkH0E0QGt6.jpg";
 
                     for user_id in users {
                         match bot
-                            .send_message(ChatId(user_id), &content)
-                            .disable_web_page_preview(true)
+                            .send_photo(
+                                ChatId(user_id),
+                                InputFile::url(Url::parse(photo_url).unwrap()),
+                            )
+                            .caption(&content)
                             .parse_mode(ParseMode::MarkdownV2)
                             .await
                         {
