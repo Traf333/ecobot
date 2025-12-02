@@ -265,7 +265,7 @@ pub async fn message_handler(
                     };
 
                     info!("Sending test advent.md to user {}", test_chat_id);
-                    let photo_path = "images/advent1.jpg";
+                    let photo_path = "src/images/advent1.jpg";
                     match bot
                         .send_photo(ChatId(test_chat_id), InputFile::file(photo_path))
                         .caption(&content)
@@ -370,7 +370,7 @@ pub async fn message_handler(
 
                     let mut success_count = 0;
                     let mut error_count = 0;
-                    let photo_path = "images/advent1.jpg";
+                    let photo_path = "src/images/advent1.jpg";
 
                     for user_id in users {
                         match bot
