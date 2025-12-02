@@ -270,21 +270,11 @@ pub async fn message_handler(
 
                     info!("Sending test advent.md to user {}", test_chat_id);
 
-                    // Get embedded image
-                    let image_data = match Images::get("advent1.jpg") {
-                        Some(file) => file.data,
-                        None => {
-                            error!("advent1.jpg not found");
-                            bot.send_message(msg.chat.id, "Изображение advent1.jpg не найдено")
-                                .await?;
-                            return Ok(());
-                        }
-                    };
-
+                    let photo_url = "https://uploads.ororo-mirror.tv/uploads/show/poster/2934/thumb_1AbpAb8hjoxd7n6hIBkH0E0QGt6.jpg";
                     match bot
                         .send_photo(
                             ChatId(test_chat_id),
-                            InputFile::memory(image_data.into_owned()).file_name("advent1.jpg"),
+                            InputFile::url(Url::parse(photo_url).unwrap()),
                         )
                         .caption(&content)
                         .parse_mode(ParseMode::MarkdownV2)
@@ -381,17 +371,6 @@ pub async fn message_handler(
 
                     info!("Sending advent.md to {} users", users.len());
 
-                    // Get embedded image
-                    let image_data = match Images::get("advent1.jpg") {
-                        Some(file) => file.data,
-                        None => {
-                            error!("advent1.jpg not found");
-                            bot.send_message(msg.chat.id, "Изображение advent1.jpg не найдено")
-                                .await?;
-                            return Ok(());
-                        }
-                    };
-
                     bot.send_message(
                         msg.chat.id,
                         format!("Отправка сообщения {} подписчикам...", users.len()),
@@ -400,13 +379,13 @@ pub async fn message_handler(
 
                     let mut success_count = 0;
                     let mut error_count = 0;
+                    let photo_url = "https://uploads.ororo-mirror.tv/uploads/show/poster/2934/thumb_1AbpAb8hjoxd7n6hIBkH0E0QGt6.jpg";
 
                     for user_id in users {
                         match bot
                             .send_photo(
                                 ChatId(user_id),
-                                InputFile::memory(image_data.clone().into_owned())
-                                    .file_name("advent1.jpg"),
+                                InputFile::url(Url::parse(photo_url).unwrap()),
                             )
                             .caption(&content)
                             .parse_mode(ParseMode::MarkdownV2)
