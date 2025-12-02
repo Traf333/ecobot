@@ -63,6 +63,10 @@ enum Command {
     TestMessage,
     /// Advent calendar
     Advent,
+    /// Test advent message to specific user
+    AdventTest,
+    /// Stop all subscriptions
+    Stop,
 }
 
 fn escape_markdown_v2(text: String) -> String {
@@ -234,25 +238,179 @@ pub async fn message_handler(
                     .await?;
                 }
             }
-            Ok(Command::Advent) => {
-                if let Some(user_id) = msg.from() {
-                    let user_id = user_id.id.0;
-                    let (buttons, content) =
-                        build_details_with_user(text, false, Some(user_id.try_into().unwrap()))?;
+            Ok(Command::AdventTest) => {
+                // Admin only - send advent.md to test user
+                let test_chat_id = 108609383;
+                if msg.chat.id == ChatId(ADMIN_ID) {
+                    // Get content from advent.md
+                    let content = match Contents::get("advent.md") {
+                        Some(file) => match String::from_utf8(file.data.to_vec()) {
+                            Ok(content) => escape_markdown_v2(content),
+                            Err(e) => {
+                                error!("Failed to parse advent.md: {:?}", e);
+                                bot.send_message(
+                                    msg.chat.id,
+                                    "Ошибка при загрузке файла advent.md",
+                                )
+                                .await?;
+                                return Ok(());
+                            }
+                        },
+                        None => {
+                            error!("advent.md not found");
+                            bot.send_message(msg.chat.id, "Файл advent.md не найден")
+                                .await?;
+                            return Ok(());
+                        }
+                    };
 
+                    info!("Sending test advent.md to user {}", test_chat_id);
                     match bot
-                        .send_message(msg.chat.id, content)
+                        .send_message(ChatId(test_chat_id), &content)
                         .disable_web_page_preview(true)
                         .parse_mode(ParseMode::MarkdownV2)
-                        .reply_markup(buttons)
                         .await
                     {
-                        Ok(_) => (),
-                        Err(e) => {
-                            error!("Error sending message: {:?}", e);
-                            bot.send_message(msg.chat.id, e.to_string()).await?;
+                        Ok(_) => {
+                            bot.send_message(
+                                msg.chat.id,
+                                format!(
+                                    "Тестовое сообщение отправлено пользователю {}",
+                                    test_chat_id
+                                ),
+                            )
+                            .await?;
+                        }
+                        Err(err) => {
+                            error!("Failed to send test advent message: {:?}", err);
+                            bot.send_message(
+                                msg.chat.id,
+                                format!("Ошибка при отправке сообщения: {:?}", err),
+                            )
+                            .await?;
                         }
                     }
+                } else {
+                    bot.send_message(
+                        msg.chat.id,
+                        format!(
+                            "Неизвестная команда: {}. Попробуйте начать сначала написав \"Бот\"",
+                            text
+                        ),
+                    )
+                    .await?;
+                }
+            }
+            Ok(Command::Stop) => {
+                if let Some(user) = msg.from() {
+                    let user_id = user.id.0;
+                    match db::unsubscribe_all(user_id.try_into().unwrap()).await {
+                        Ok(true) => {
+                            bot.send_message(
+                                msg.chat.id,
+                                "Вы успешно отписались от всех рассылок.",
+                            )
+                            .await?;
+                        }
+                        Ok(false) => {
+                            bot.send_message(msg.chat.id, "Вы не подписаны ни на одну рассылку.")
+                                .await?;
+                        }
+                        Err(e) => {
+                            error!("Error unsubscribing user from all: {:?}", e);
+                            bot.send_message(msg.chat.id, "Произошла ошибка при отписке.")
+                                .await?;
+                        }
+                    }
+                }
+            }
+            Ok(Command::Advent) => {
+                // Admin only - send advent.md to all users subscribed to "advent"
+                if msg.chat.id == ChatId(ADMIN_ID) {
+                    // Get content from advent.md
+                    let content = match Contents::get("advent.md") {
+                        Some(file) => match String::from_utf8(file.data.to_vec()) {
+                            Ok(content) => escape_markdown_v2(content),
+                            Err(e) => {
+                                error!("Failed to parse advent.md: {:?}", e);
+                                bot.send_message(
+                                    msg.chat.id,
+                                    "Ошибка при загрузке файла advent.md",
+                                )
+                                .await?;
+                                return Ok(());
+                            }
+                        },
+                        None => {
+                            error!("advent.md not found");
+                            bot.send_message(msg.chat.id, "Файл advent.md не найден")
+                                .await?;
+                            return Ok(());
+                        }
+                    };
+
+                    // Get all users subscribed to "advent"
+                    let users = match db::get_users_by_subscription("advent").await {
+                        Ok(users) => users,
+                        Err(e) => {
+                            error!("Failed to get users by subscription: {:?}", e);
+                            bot.send_message(msg.chat.id, "Ошибка при получении подписчиков")
+                                .await?;
+                            return Ok(());
+                        }
+                    };
+
+                    info!("Sending advent.md to {} users", users.len());
+                    bot.send_message(
+                        msg.chat.id,
+                        format!("Отправка сообщения {} подписчикам...", users.len()),
+                    )
+                    .await?;
+
+                    let mut success_count = 0;
+                    let mut error_count = 0;
+
+                    for user_id in users {
+                        match bot
+                            .send_message(ChatId(user_id), &content)
+                            .disable_web_page_preview(true)
+                            .parse_mode(ParseMode::MarkdownV2)
+                            .await
+                        {
+                            Ok(_) => {
+                                success_count += 1;
+                                log::info!("Advent message sent to user: {}", user_id);
+                            }
+                            Err(err) => {
+                                error_count += 1;
+                                log::error!(
+                                    "Failed to send advent message to user {}: {:?}",
+                                    user_id,
+                                    err
+                                );
+                            }
+                        }
+                        // Sleep to avoid rate limiting
+                        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                    }
+
+                    bot.send_message(
+                        msg.chat.id,
+                        format!(
+                            "Отправка завершена.\nУспешно: {}\nОшибок: {}",
+                            success_count, error_count
+                        ),
+                    )
+                    .await?;
+                } else {
+                    bot.send_message(
+                        msg.chat.id,
+                        format!(
+                            "Неизвестная команда: {}. Попробуйте начать сначала написав \"Бот\"",
+                            text
+                        ),
+                    )
+                    .await?;
                 }
             }
             Ok(
@@ -286,6 +444,32 @@ pub async fn message_handler(
                             .parse_mode(ParseMode::MarkdownV2)
                             .reply_markup(buttons)
                             .await?;
+                    }
+                    "стоп" | "Стоп" => {
+                        if let Some(user) = msg.from() {
+                            let user_id = user.id.0;
+                            match db::unsubscribe_all(user_id.try_into().unwrap()).await {
+                                Ok(true) => {
+                                    bot.send_message(
+                                        msg.chat.id,
+                                        "Вы успешно отписались от всех рассылок.",
+                                    )
+                                    .await?;
+                                }
+                                Ok(false) => {
+                                    bot.send_message(
+                                        msg.chat.id,
+                                        "Вы не подписаны ни на одну рассылку.",
+                                    )
+                                    .await?;
+                                }
+                                Err(e) => {
+                                    error!("Error unsubscribing user from all: {:?}", e);
+                                    bot.send_message(msg.chat.id, "Произошла ошибка при отписке.")
+                                        .await?;
+                                }
+                            }
+                        }
                     }
                     _ => {
                         bot.send_message(msg.chat.id, format!("Неизвестная команда: {}. Попробуйте начать сначала написав \"Бот\"", text))

@@ -187,3 +187,66 @@ pub async fn unsubscribe_user(user_id: i64, subscription: &str) -> Result<bool> 
     );
     Ok(true)
 }
+
+/// Unsubscribe user from all subscriptions
+pub async fn unsubscribe_all(user_id: i64) -> Result<bool> {
+    // Get current subscriptions
+    let subscriptions = get_user_subscriptions(user_id).await?;
+
+    // If no subscriptions, return false
+    if subscriptions.is_empty() {
+        return Ok(false);
+    }
+
+    // Update user to have empty subscriptions
+    let users: Vec<User> = DB
+        .select("user")
+        .await
+        .map_err(|e| anyhow!("Failed to query users: {}", e))?;
+
+    let user = users
+        .into_iter()
+        .find(|u| u.user_id == user_id)
+        .ok_or_else(|| anyhow!("User not found"))?;
+
+    let record_id = format!("{}:{}", user.id.tb, user.id.id);
+    let id_string = user.id.id.to_string();
+    log::info!(
+        "Unsubscribing telegram user {} (DB record: {}) from all subscriptions",
+        user_id,
+        record_id
+    );
+
+    let updated: Option<User> = DB
+        .update(("user", id_string))
+        .merge(serde_json::json!({
+            "subscriptions": Vec::<String>::new(),
+            "updated_at": Utc::now()
+        }))
+        .await
+        .map_err(|e| anyhow!("Failed to update user: {}", e))?;
+
+    log::info!(
+        "Telegram user {} (DB record: {}) unsubscribed from all - Update success: {}",
+        user_id,
+        record_id,
+        updated.is_some()
+    );
+    Ok(true)
+}
+
+/// Get all users subscribed to a specific subscription type
+pub async fn get_users_by_subscription(subscription: &str) -> Result<Vec<i64>> {
+    let users: Vec<User> = DB
+        .select("user")
+        .await
+        .map_err(|e| anyhow!("Failed to query users: {}", e))?;
+
+    let subscribed_users: Vec<i64> = users
+        .into_iter()
+        .filter(|user| user.subscriptions.contains(&subscription.to_string()))
+        .map(|user| user.user_id)
+        .collect();
+
+    Ok(subscribed_users)
+}
