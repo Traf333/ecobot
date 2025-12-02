@@ -423,7 +423,7 @@ pub async fn message_handler(
                                 );
                             }
                         }
-                        // Sleep to avoid rate limiting
+
                         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
                     }
 
