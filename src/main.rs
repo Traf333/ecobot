@@ -6,6 +6,7 @@ use handlers::{callback_handler, message_handler};
 use std::env;
 use teloxide::prelude::*;
 
+mod commands;
 mod db;
 mod handlers;
 mod route;
