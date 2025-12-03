@@ -1,5 +1,10 @@
 use log::error;
-use teloxide::{prelude::Requester, types::ChatId, Bot};
+use teloxide::{
+    payloads::SendMessageSetters,
+    prelude::Requester,
+    types::{ChatId, ParseMode},
+    Bot,
+};
 
 use crate::db;
 
@@ -35,9 +40,10 @@ impl StopCommand {
                         return Ok(());
                     }
                 };
-                // Note: content is loaded but not sent - this appears to be a bug in original code
-                // Keeping behavior as-is for now
-                let _ = content;
+
+                bot.send_message(chat_id, content)
+                    .parse_mode(ParseMode::MarkdownV2)
+                    .await?;
             }
             Ok(false) => {
                 bot.send_message(chat_id, "Вы не подписаны ни на одну рассылку.")
