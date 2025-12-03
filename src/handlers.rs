@@ -270,7 +270,7 @@ pub async fn message_handler(
 
                     info!("Sending test advent.md to user {}", test_chat_id);
 
-                    let photo_url = "https://raw.githubusercontent.com/Traf333/ecobot/refs/heads/main/src/images/advent1.jpg";
+                    let photo_url = "https://raw.githubusercontent.com/Traf333/ecobot/refs/heads/main/src/images/advent.jpg";
                     match bot
                         .send_photo(
                             ChatId(test_chat_id),
@@ -398,7 +398,7 @@ pub async fn message_handler(
 
                     let mut success_count = 0;
                     let mut error_count = 0;
-                    let photo_url = "https://raw.githubusercontent.com/Traf333/ecobot/refs/heads/main/src/images/advent1.jpg";
+                    let photo_url = "https://raw.githubusercontent.com/Traf333/ecobot/refs/heads/main/src/images/advent.jpg";
 
                     for user_id in users {
                         match bot
