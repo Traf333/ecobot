@@ -16,8 +16,11 @@ docker run -d --name ecobot-app --network host --env-file .env ecobot
 ## Managing the Container
 
 ```bash
-# View logs
+# View live logs (current container)
 docker logs -f ecobot-app
+
+# View persistent logs (survives deployments)
+tail -f /opt/ecobot/logs/ecobot.log
 
 # Stop
 docker stop ecobot-app
