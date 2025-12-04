@@ -72,6 +72,7 @@ struct ESSOFeature {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[allow(non_snake_case)]
 struct ESSOProperties {
     name: String,
     description: String,
@@ -85,6 +86,7 @@ struct ESSOGeometry {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[allow(non_snake_case)]
 struct ESSOOptions {
     zIndex: i64,
     order: i64,
