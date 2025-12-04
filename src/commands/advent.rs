@@ -12,7 +12,7 @@ use crate::db;
 use super::common::{escape_markdown_v2, Contents};
 
 const PHOTO_URL: &str =
-    "https://raw.githubusercontent.com/Traf333/ecobot/refs/heads/main/src/images/advent1.jpg";
+    "https://raw.githubusercontent.com/Traf333/ecobot/refs/heads/main/src/images/advent2.jpg";
 
 pub struct AdventCommand;
 
