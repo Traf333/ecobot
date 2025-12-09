@@ -51,17 +51,6 @@ jobs:
             # Create logs directory if it doesn't exist
             mkdir -p /opt/ecobot/logs
 
-            # Save logs from old container before removing
-            if docker ps -a --format '{{.Names}}' | grep -q "^${{ env.CONTAINER_NAME }}$"; then
-              docker logs ${{ env.CONTAINER_NAME }} >> /opt/ecobot/logs/ecobot.log 2>&1 || true
-              echo "--- Container restarted at $(date) ---" >> /opt/ecobot/logs/ecobot.log
-            fi
-
-            # Rotate logs if file exceeds 50MB
-            if [ -f /opt/ecobot/logs/ecobot.log ] && [ $(stat -c%s /opt/ecobot/logs/ecobot.log 2>/dev/null || stat -f%z /opt/ecobot/logs/ecobot.log) -gt 52428800 ]; then
-              mv /opt/ecobot/logs/ecobot.log /opt/ecobot/logs/ecobot.log.1
-            fi
-
             # Stop and remove old container
             docker stop ${{ env.CONTAINER_NAME }} || true
             docker rm ${{ env.CONTAINER_NAME }} || true
@@ -72,9 +61,6 @@ jobs:
               --restart unless-stopped \
               --network host \
               --env-file /opt/ecobot/.env \
-              --log-driver json-file \
-              --log-opt max-size=10m \
-              --log-opt max-file=5 \
               -v /opt/ecobot/logs:/var/log/ecobot \
               ${{ env.DOCKER_IMAGE }}:latest
 

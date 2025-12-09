@@ -26,15 +26,6 @@ async fn main() -> anyhow::Result<()> {
         .target(Target::Stderr)
         .init();
 
-    // Also write startup info to persistent log file (mounted volume in Docker)
-    if let Ok(mut file) = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open("/var/log/ecobot/ecobot.log")
-    {
-        let _ = writeln!(file, "=== ECOBOT STARTING at {} ===", chrono::Local::now());
-    }
-
     log::info!("Starting bot at time: {}", chrono::Local::now());
 
     let telegram_bot_token =
