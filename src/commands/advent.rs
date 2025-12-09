@@ -24,7 +24,7 @@ impl AdventCommand {
                 Ok(content) => Ok(escape_markdown_v2(content)),
                 Err(e) => {
                     error!("Failed to parse advent.md: {:?}", e);
-                    Err("Ошибка при загрузке файла advent.md".to_string())
+                    Err("Ошибка при загрузке advent.md".to_string())
                 }
             },
             None => {
