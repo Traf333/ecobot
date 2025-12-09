@@ -2,7 +2,7 @@
 #![allow(unused)]
 
 use dotenv::dotenv;
-use env_logger::{Builder, Env, Target};
+use env_logger::{Builder, Target};
 use handlers::{callback_handler, message_handler};
 use std::env;
 use std::fs::OpenOptions;
@@ -15,16 +15,23 @@ mod handlers;
 mod route;
 mod users;
 
+fn init_logging() {
+    let file = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open("/var/log/ecobot/ecobot.log")
+        .expect("cannot open log file");
+
+    Builder::new()
+        .parse_default_env()
+        .target(Target::Pipe(Box::new(file)))
+        .init();
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenv().ok();
-
-    // Initialize logger with default level "info" if RUST_LOG is not set
-    // Logs go to stderr which Docker captures
-    Builder::from_env(Env::default().default_filter_or("info"))
-        .format_timestamp_millis()
-        .target(Target::Stderr)
-        .init();
+    init_logging();
 
     log::info!("Starting bot at time: {}", chrono::Local::now());
 
