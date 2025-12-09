@@ -39,9 +39,12 @@ RUN apt-get update && \
 # Copy the binary from builder
 COPY --from=builder /app/target/release/ecobot /app/ecobot
 
-# Create a non-root user
+# Create log directory for persistent logs
+RUN mkdir -p /var/log/ecobot
+
+# Create a non-root user and give ownership of app and log dirs
 RUN useradd -m -u 1000 botuser && \
-    chown -R botuser:botuser /app
+    chown -R botuser:botuser /app /var/log/ecobot
 
 USER botuser
 
