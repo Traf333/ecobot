@@ -61,6 +61,7 @@ jobs:
               --restart unless-stopped \
               --network host \
               --env-file /opt/ecobot/.env \
+              -e LOG_PATH=/var/log/ecobot/ecobot.log \
               -v /opt/ecobot/logs:/var/log/ecobot \
               ${{ env.DOCKER_IMAGE }}:latest
 

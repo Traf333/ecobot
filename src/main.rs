@@ -16,10 +16,18 @@ mod route;
 mod users;
 
 fn init_logging() {
+    let log_path = std::env::var("LOG_PATH").unwrap_or_else(|_| "ecobot.log".to_string());
+
+    if let Some(parent) = std::path::Path::new(&log_path).parent() {
+        if !parent.as_os_str().is_empty() {
+            std::fs::create_dir_all(parent).expect("cannot create log directory");
+        }
+    }
+
     let file = OpenOptions::new()
         .create(true)
         .append(true)
-        .open("/var/log/ecobot/ecobot.log")
+        .open(&log_path)
         .expect("cannot open log file");
 
     Builder::new()
