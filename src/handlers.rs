@@ -19,7 +19,6 @@ use crate::users;
 #[derive(BotCommands)]
 #[command(rename_rule = "lowercase")]
 enum Command {
-    /// Display this text
     Help,
     /// Start
     Start,
