@@ -92,9 +92,9 @@
     "path": "/other",
     "label": "Другое"
   },
-  "autumnecodvor25": {
-    "path": "/autumnecodvor25",
-    "label": "Осенний Экодвор"
+  "letter": {
+    "path": "/letter",
+    "label": "Рассылка"
   },
   "subscriptions": {
     "path": "/subscriptions",
