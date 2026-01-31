@@ -13,6 +13,8 @@ pub struct User {
     pub subscriptions: Vec<String>,
     #[serde(default = "Utc::now")]
     pub updated_at: DateTime<Utc>,
+    #[serde(default)]
+    pub blacklisted: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -21,6 +23,7 @@ struct CreateUser {
     created_at: DateTime<Utc>,
     subscriptions: Vec<String>,
     updated_at: DateTime<Utc>,
+    blacklisted: bool,
 }
 
 /// Store a user ID in the database
@@ -37,6 +40,7 @@ pub async fn store_user(user_id: i64) -> Result<bool> {
         created_at: now,
         subscriptions: vec![],
         updated_at: now,
+        blacklisted: false,
     };
 
     let created: Option<User> = DB
@@ -249,4 +253,55 @@ pub async fn get_users_by_subscription(subscription: &str) -> Result<Vec<i64>> {
         .collect();
 
     Ok(subscribed_users)
+}
+
+/// Blacklist a user (mark as unable to receive messages)
+pub async fn blacklist_user(user_id: i64) -> Result<bool> {
+    let users: Vec<User> = DB
+        .select("user")
+        .await
+        .map_err(|e| anyhow!("Failed to query users: {}", e))?;
+
+    let user = users
+        .into_iter()
+        .find(|u| u.user_id == user_id)
+        .ok_or_else(|| anyhow!("User not found"))?;
+
+    if user.blacklisted {
+        return Ok(false);
+    }
+
+    let id_string = user.id.id.to_string();
+    log::info!("Blacklisting user {}", user_id);
+
+    let updated: Option<User> = DB
+        .update(("user", id_string))
+        .merge(serde_json::json!({
+            "blacklisted": true,
+            "updated_at": Utc::now()
+        }))
+        .await
+        .map_err(|e| anyhow!("Failed to blacklist user: {}", e))?;
+
+    log::info!(
+        "User {} blacklisted - Update success: {}",
+        user_id,
+        updated.is_some()
+    );
+    Ok(true)
+}
+
+#[derive(serde::Deserialize)]
+struct UserIdRow {
+    user_id: i64,
+}
+
+pub async fn get_active_users() -> Result<Vec<i64>> {
+    let rows: Vec<UserIdRow> = DB
+        .query("SELECT user_id FROM user WHERE blacklisted = false")
+        .await
+        .map_err(|e| anyhow!("Failed to query users: {}", e))?
+        .take(0)?;
+
+    Ok(rows.into_iter().map(|row| row.user_id).collect())
 }
