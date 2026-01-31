@@ -6,7 +6,7 @@ use teloxide::{
     Bot,
 };
 
-use crate::users;
+use crate::users::{self, blacklist_user, get_active_users};
 
 use super::common::build_details_with_user;
 
@@ -63,19 +63,14 @@ impl BroadcastCommand {
         admin_chat_id: ChatId,
         route: &str,
     ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        let blacklisted_ids: Vec<i64> = vec![];
-
-        let users = users::get_all_users().await?;
-        info!("Broadcasting to {} users", users.len());
+        let users = get_active_users().await?;
+        info!("Broadcasting to {} active users", users.len());
 
         let mut success_count = 0;
         let mut error_count = 0;
+        let mut blacklisted_count = 0;
 
         for user_id in users {
-            if blacklisted_ids.contains(&user_id) {
-                continue;
-            }
-
             match Self::send_to_user(bot, user_id, route).await {
                 Ok(_) => {
                     success_count += 1;
@@ -84,6 +79,14 @@ impl BroadcastCommand {
                 Err(err) => {
                     error_count += 1;
                     error!("Failed to send message to user {}: {:?}", user_id, err);
+
+                    // Blacklist user on send failure
+                    if let Err(e) = blacklist_user(user_id).await {
+                        error!("Failed to blacklist user {}: {:?}", user_id, e);
+                    } else {
+                        blacklisted_count += 1;
+                        info!("User {} has been blacklisted", user_id);
+                    }
                 }
             }
 
@@ -93,8 +96,8 @@ impl BroadcastCommand {
         bot.send_message(
             admin_chat_id,
             format!(
-                "Отправка завершена.\nУспешно: {}\nОшибок: {}",
-                success_count, error_count
+                "Отправка завершена.\nУспешно: {}\nОшибок: {}\nЗаблокировано: {}",
+                success_count, error_count, blacklisted_count
             ),
         )
         .await?;
