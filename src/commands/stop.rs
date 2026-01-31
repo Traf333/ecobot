@@ -8,7 +8,7 @@ use teloxide::{
 
 use crate::db;
 
-use super::common::{escape_markdown_v2, Contents};
+use super::common::Contents;
 
 pub struct StopCommand;
 
@@ -22,7 +22,7 @@ impl StopCommand {
             Ok(true) => {
                 let content = match Contents::get("unsubscribe_advent.md") {
                     Some(file) => match String::from_utf8(file.data.to_vec()) {
-                        Ok(content) => escape_markdown_v2(content),
+                        Ok(content) => content,
                         Err(e) => {
                             error!("Failed to parse unsubscribe_advent.md: {:?}", e);
                             bot.send_message(
@@ -42,7 +42,7 @@ impl StopCommand {
                 };
 
                 bot.send_message(chat_id, content)
-                    .parse_mode(ParseMode::MarkdownV2)
+                    .parse_mode(ParseMode::Html)
                     .await?;
             }
             Ok(false) => {

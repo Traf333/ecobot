@@ -26,7 +26,7 @@ impl SubscriptionCommand {
                 let (buttons, content) = build_details(callback_text, false)?;
                 bot.send_message(user_id, content)
                     .disable_web_page_preview(true)
-                    .parse_mode(ParseMode::MarkdownV2)
+                    .parse_mode(ParseMode::Html)
                     .reply_markup(buttons)
                     .await?;
                 Ok(true)
@@ -58,7 +58,7 @@ impl SubscriptionCommand {
                 let (buttons, content) = build_details(callback_text, false)?;
                 bot.send_message(user_id, content)
                     .disable_web_page_preview(true)
-                    .parse_mode(ParseMode::MarkdownV2)
+                    .parse_mode(ParseMode::Html)
                     .reply_markup(buttons)
                     .await?;
                 Ok(true)

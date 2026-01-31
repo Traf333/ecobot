@@ -20,7 +20,7 @@ impl ContentCommand {
 
         bot.send_message(chat_id, content)
             .disable_web_page_preview(true)
-            .parse_mode(ParseMode::MarkdownV2)
+            .parse_mode(ParseMode::Html)
             .reply_markup(buttons)
             .await?;
 
@@ -38,7 +38,7 @@ impl ContentCommand {
 
         bot.send_message(chat_id, content)
             .disable_web_page_preview(true)
-            .parse_mode(ParseMode::MarkdownV2)
+            .parse_mode(ParseMode::Html)
             .reply_markup(buttons)
             .await?;
 
