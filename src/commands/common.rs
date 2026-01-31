@@ -10,14 +10,6 @@ pub struct Contents;
 pub const ADMIN_ID: i64 = 283564928;
 pub const TEST_USER_ID: i64 = 108609383;
 
-pub fn escape_markdown_v2(text: String) -> String {
-    text.replace('.', "\\.")
-        .replace('-', "\\-")
-        .replace('{', "\\{")
-        .replace('}', "\\}")
-        .replace('!', "\\!")
-}
-
 pub fn build_details(
     text: &str,
     is_external: bool,
@@ -39,19 +31,12 @@ pub fn build_details_with_user(
     let content = String::from_utf8(content.to_vec())?;
     let buttons = build_buttons_with_user(&route, is_external, user_id);
 
-    Ok((buttons, escape_markdown_v2(content)))
+    Ok((buttons, content))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_escape_markdown_v2() {
-        let input = "Hello. World-Test {foo} bar!".to_string();
-        let expected = "Hello\\. World\\-Test \\{foo\\} bar\\!";
-        assert_eq!(escape_markdown_v2(input), expected);
-    }
 
     #[test]
     fn test_build_details_start() {

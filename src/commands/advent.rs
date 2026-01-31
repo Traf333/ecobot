@@ -9,7 +9,7 @@ use teloxide::{
 
 use crate::db;
 
-use super::common::{escape_markdown_v2, Contents};
+use super::common::Contents;
 
 const PHOTO_URL: &str =
     "https://raw.githubusercontent.com/Traf333/ecobot/refs/heads/main/src/images/25.jpg";
@@ -21,7 +21,7 @@ impl AdventCommand {
     fn load_content() -> Result<String, String> {
         match Contents::get("advent.md") {
             Some(file) => match String::from_utf8(file.data.to_vec()) {
-                Ok(content) => Ok(escape_markdown_v2(content)),
+                Ok(content) => Ok(content),
                 Err(e) => {
                     error!("Failed to parse advent.md: {:?}", e);
                     Err("Ошибка при загрузке advent.md".to_string())
@@ -41,7 +41,7 @@ impl AdventCommand {
             InputFile::url(Url::parse(PHOTO_URL).unwrap()),
         )
         .caption(content)
-        .parse_mode(ParseMode::MarkdownV2)
+        .parse_mode(ParseMode::Html)
         .await
         .map(|_| ())
         .map_err(|e| format!("{:?}", e))

@@ -7,8 +7,6 @@ use teloxide::{
 
 use crate::db;
 
-use super::common::escape_markdown_v2;
-
 pub struct LocationCommand;
 
 impl LocationCommand {
@@ -24,10 +22,11 @@ impl LocationCommand {
         let mut content = "".to_string();
 
         if bin_locations.is_empty() {
-            content = "*3- и 4-секционные контейнеры РСО в радиусе 1 км не найдены.*".to_string();
-            content.push_str("\n👉 Проверить самостоятельно [на сайте обслуживающей компании ЕСОО](https://new.esoo39.ru/%d1%80%d1%81%d0%be/)");
+            content =
+                "<b>3- и 4-секционные контейнеры РСО в радиусе 1 км не найдены.</b>".to_string();
+            content.push_str("\n👉 Проверить самостоятельно <a href=\"https://new.esoo39.ru/rso-maps/\">на сайте обслуживающей компании ЕСОО</a>");
         } else {
-            content = "*Ближайшие 3- и 4-секционные контейнеры РСО:*".to_string();
+            content = "<b>Ближайшие 3- и 4-секционные контейнеры РСО:</b>".to_string();
             for (distance, bin_location) in bin_locations.into_iter().take(2) {
                 let link_url = format!(
                     "https://yandex.ru/maps/?rtext={},{}~{},{}&rtt=pedestrian",
@@ -39,26 +38,26 @@ impl LocationCommand {
                     "без стекла"
                 };
                 let bin_text = format!(
-                    "\n{} м [{}]({}) {}",
+                    "\n{} м <a href=\"{}\">{}</a> {}",
                     (distance * 1000.0).round(),
-                    bin_location.address,
                     link_url,
+                    bin_location.address,
                     glass_text
                 );
                 content.push_str(&bin_text);
             }
-            content.push_str("\n👉 Проверить самостоятельно [на сайте обслуживающей компании ЕСОО](https://new.esoo39.ru/%d1%80%d1%81%d0%be/)");
+            content.push_str("\n👉 Проверить самостоятельно <a href=\"https://new.esoo39.ru/rso-maps/\">на сайте обслуживающей компании ЕСОО</a>");
         }
 
         let main_point = db::main_point();
         let distance_to_main = (main_point.distance(latitude, longitude) * 1000.0).round();
         if distance_to_main < 1000.0 {
             content.push_str(
-                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на [ул. 5-я Причальная 2а](https://yandex.ru/maps/?rtext={},{}~{},{}&rtt=pedestrian) в радиусе {} м.", latitude, longitude, main_point.latitude, main_point.longitude, distance_to_main)
+                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на <a href=\"https://yandex.ru/maps/?rtext={},{}~{},{}&amp;rtt=pedestrian\">ул. 5-я Причальная 2а</a> в радиусе {} м.", latitude, longitude, main_point.latitude, main_point.longitude, distance_to_main)
             );
         } else {
             content.push_str(
-                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на [ул. 5-я Причальная 2а](https://yandex.ru/maps/?text={},{}).", main_point.latitude, main_point.longitude)
+                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на <a href=\"https://yandex.ru/maps/?text={},{}\">ул. 5-я Причальная 2а</a>.", main_point.latitude, main_point.longitude)
             );
         }
 
@@ -66,9 +65,9 @@ impl LocationCommand {
             "\n\nОтправьте новую геопозицию, если хотите найти другие контейнеры.\nОтправьте «Бот», если хотите вернуться в начало.",
         );
 
-        bot.send_message(chat_id, escape_markdown_v2(content))
+        bot.send_message(chat_id, content)
             .disable_web_page_preview(true)
-            .parse_mode(ParseMode::MarkdownV2)
+            .parse_mode(ParseMode::Html)
             .await?;
 
         Ok(())

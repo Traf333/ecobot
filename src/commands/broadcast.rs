@@ -23,7 +23,7 @@ impl BroadcastCommand {
 
         bot.send_message(ChatId(user_id), &content)
             .disable_web_page_preview(true)
-            .parse_mode(ParseMode::MarkdownV2)
+            .parse_mode(ParseMode::Html)
             .reply_markup(buttons)
             .await?;
 
