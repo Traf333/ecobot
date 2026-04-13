@@ -49,7 +49,7 @@ jobs:
 
             # Create logs directory and ensure it's writable
             mkdir -p /opt/ecobot/logs
-            chmod 777 /opt/ecobot/logs
+            chown -R 1000:1000 /opt/ecobot/logs
 
             docker stop ${{ env.CONTAINER_NAME }} || true
             docker rm ${{ env.CONTAINER_NAME }} || true
