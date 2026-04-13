@@ -41,7 +41,10 @@ async fn main() -> anyhow::Result<()> {
     dotenv().ok();
     init_logging();
 
-    log::info!("Starting bot at time: {}", chrono::Local::now());
+    log::info!(
+        "Starting bot at time (new server): {}",
+        chrono::Local::now()
+    );
 
     let telegram_bot_token =
         env::var("TELOXIDE_TOKEN").expect("TELOXIDE_TOKEN should be set in environment");
