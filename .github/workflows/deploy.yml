@@ -45,17 +45,15 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            # Pull the latest image
             docker pull ${{ env.DOCKER_IMAGE }}:latest
 
-            # Create logs directory if it doesn't exist
+            # Create logs directory and ensure it's writable
             mkdir -p /opt/ecobot/logs
+            chmod 777 /opt/ecobot/logs
 
-            # Stop and remove old container
             docker stop ${{ env.CONTAINER_NAME }} || true
             docker rm ${{ env.CONTAINER_NAME }} || true
 
-            # Run new container with persistent logging
             docker run -d \
               --name ${{ env.CONTAINER_NAME }} \
               --restart unless-stopped \
@@ -65,5 +63,4 @@ jobs:
               -v /opt/ecobot/logs:/var/log/ecobot \
               ${{ env.DOCKER_IMAGE }}:latest
 
-            # Clean up old images
             docker image prune -af --filter "until=48h"
