@@ -134,7 +134,7 @@ pub fn main_point() -> BinLocation {
         id: ("bin_location", "main").into(),
         latitude: 54.697340,
         longitude: 20.470642,
-        address: "Причальная 5-я улица, 2а".to_string(),
+        address: "г. Калининград, улица 5-я Причальная, 2а".to_string(),
         preset: "all".to_string(),
     }
 }
