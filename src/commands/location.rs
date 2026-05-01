@@ -53,11 +53,11 @@ impl LocationCommand {
         let distance_to_main = (main_point.distance(latitude, longitude) * 1000.0).round();
         if distance_to_main < 1000.0 {
             content.push_str(
-                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на <a href=\"https://yandex.ru/maps/?rtext={},{}~{},{}&amp;rtt=pedestrian\">ул. 5-я Причальная 2а</a> в радиусе {} м.", latitude, longitude, main_point.latitude, main_point.longitude, distance_to_main)
+                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на <a href=\"https://yandex.ru/maps/?rtext={},{}~{},{}&amp;rtt=pedestrian\">г. Калининград, ул. 5-я Причальная 2а</a> в радиусе {} м.", latitude, longitude, main_point.latitude, main_point.longitude, distance_to_main)
             );
         } else {
             content.push_str(
-                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на <a href=\"https://yandex.ru/maps/?text={},{}\">ул. 5-я Причальная 2а</a>.", main_point.latitude, main_point.longitude)
+                &format!("\n\nПлощадка раздельного сбора с самым большим перечнем принимаемых фракций находится на <a href=\"https://yandex.ru/maps/?text={},{}\">г. Калининград, ул. 5-я Причальная 2а</a>.", main_point.latitude, main_point.longitude)
             );
         }
 
