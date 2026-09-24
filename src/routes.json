@@ -2,7 +2,7 @@
   "start": {
     "path": "/",
     "label": "Главная",
-    "children": ["recycling", "give_away", "faq"]
+    "children": ["recycling", "give_away", "faq", "zerowaste"]
   },
   "faq": {
     "path": "/faq",
@@ -91,6 +91,11 @@
   "other": {
     "path": "/other",
     "label": "Другое"
+  }, 
+  "zerowaste": {
+    "path": "/zerowaste",
+    "label": "Ноль отходов",
+    "children": ["zerowaste2"]
   },
   "letter": {
     "path": "/letter",
