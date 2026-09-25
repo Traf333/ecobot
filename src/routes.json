@@ -97,6 +97,10 @@
     "label": "Ноль отходов",
     "children": ["zerowaste2"]
   },
+  "zerowaste2": {
+    "path": "/zerowaste2",
+    "label": "Нажимаю"
+  },
   "letter": {
     "path": "/letter",
     "label": "Рассылка"
